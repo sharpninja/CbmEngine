@@ -1,0 +1,3 @@
+[submodule "external/vice-sharp"]
+	path = external/vice-sharp
+	url = https://github.com/sharpninja/vice-sharp.git

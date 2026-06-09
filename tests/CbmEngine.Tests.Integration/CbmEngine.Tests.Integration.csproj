@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="Moq" Version="4.20.72" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.10" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\CbmEngine.Abstractions\CbmEngine.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\CbmEngine.Systems\CbmEngine.Systems.csproj" />
+    <ProjectReference Include="..\..\src\CbmEngine.Pipeline\CbmEngine.Pipeline.csproj" />
+    <ProjectReference Include="..\..\external\vice-sharp\src\ViceSharp.Abstractions\ViceSharp.Abstractions.csproj" />
+    <ProjectReference Include="..\..\external\vice-sharp\src\ViceSharp.Core\ViceSharp.Core.csproj" />
+    <ProjectReference Include="..\..\external\vice-sharp\src\ViceSharp.Chips\ViceSharp.Chips.csproj" />
+    <ProjectReference Include="..\..\external\vice-sharp\src\ViceSharp.Architectures\ViceSharp.Architectures.csproj" />
+    <ProjectReference Include="..\..\src\CbmEngine.Host.MonoGame\CbmEngine.Host.MonoGame.csproj" />
+    <ProjectReference Include="..\CbmEngine.Tests.Shared\CbmEngine.Tests.Shared.csproj" />
+    <ProjectReference Include="..\..\src\CbmEngine.Game.Sample\CbmEngine.Game.Sample.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\external\vice-sharp\native\vice_x64.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" Condition="Exists('..\..\external\vice-sharp\native\vice_x64.dll')" />
+  </ItemGroup>
+
+</Project>

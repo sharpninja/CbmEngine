@@ -1,0 +1,28 @@
+<Solution>
+  <Folder Name="/external/" />
+  <Folder Name="/external/vice-sharp/" />
+  <Folder Name="/external/vice-sharp/src/">
+    <Project Path="external/vice-sharp/src/ViceSharp.Abstractions/ViceSharp.Abstractions.csproj" />
+    <Project Path="external/vice-sharp/src/ViceSharp.Architectures/ViceSharp.Architectures.csproj" />
+    <Project Path="external/vice-sharp/src/ViceSharp.Chips/ViceSharp.Chips.csproj" />
+    <Project Path="external/vice-sharp/src/ViceSharp.Core/ViceSharp.Core.csproj" />
+    <Project Path="external/vice-sharp/src/ViceSharp.RomFetch/ViceSharp.RomFetch.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/CbmEngine.Abstractions/CbmEngine.Abstractions.csproj" />
+    <Project Path="src/CbmEngine.Game.Sample/CbmEngine.Game.Sample.csproj" />
+    <Project Path="src/CbmEngine.Host.MonoGame/CbmEngine.Host.MonoGame.csproj" />
+    <Project Path="src/CbmEngine.Pipeline/CbmEngine.Pipeline.csproj" />
+    <Project Path="src/CbmEngine.Systems/CbmEngine.Systems.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CbmEngine.Tests.Integration/CbmEngine.Tests.Integration.csproj" />
+    <Project Path="tests/CbmEngine.Tests.Shared/CbmEngine.Tests.Shared.csproj" />
+    <Project Path="tests/CbmEngine.Tests.Unit/CbmEngine.Tests.Unit.csproj" />
+  </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/AnalyzeFrostCapture/AnalyzeFrostCapture.csproj" />
+    <Project Path="tools/BuildFrostPointCrt/BuildFrostPointCrt.csproj" />
+    <Project Path="tools/DumpSprites/DumpSprites.csproj" />
+  </Folder>
+</Solution>

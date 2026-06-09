@@ -1,0 +1,29 @@
+AGENTS-README-FIRST.yaml
+.mcpServer/
+
+# Build output
+bin/
+obj/
+*.user
+*.suo
+
+# Visual Studio
+.vs/
+
+# JetBrains
+.idea/
+
+# MCP DB + scratch
+mcp.db
+mcp.db-journal
+tmp/
+scaffold-run.log
+
+# Test results
+TestResults/
+*.trx
+aiunit-results/
+
+# OS junk
+Thumbs.db
+.DS_Store
