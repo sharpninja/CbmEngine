@@ -16,4 +16,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="CbmEngine.Tests.Unit" />
+    <InternalsVisibleTo Include="CbmEngine.Tests.Integration" />
+  </ItemGroup>
+
 </Project>

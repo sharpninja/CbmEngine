@@ -27,3 +27,14 @@ aiunit-results/
 # OS junk
 Thumbs.db
 .DS_Store
+
+# Generated scratch / capture artifacts
+artifacts/
+
+# Backup + scratch markers
+*.deleted-*
+todo-bootstrap.marker
+
+# NuGet package output
+*.nupkg
+**/nupkg/

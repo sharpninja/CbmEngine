@@ -1,0 +1,55 @@
+<Project>
+
+  <!--
+    CbmEngine .cbmvid Content packaging for MonoGame projects.
+
+    Behavior:
+      * Treats every <CbmVidContent> item as MonoGame Content. The file is
+        copied (as-is, no XNB transform) into the output directory at the
+        relative path declared by ContentLink, defaulting to the original
+        relative path under "Content/".
+      * Runs a pre-build validation step that parses the .cbmvid header
+        and checks the file size matches the declared frame count. Fails
+        the build with an MSBuild error if invalid.
+
+    Usage (in a MonoGame project's .csproj):
+
+      <ItemGroup>
+        <CbmVidContent Include="Content\Video\intro.cbmvid" />
+      </ItemGroup>
+
+      <Import Project="..\..\build\CbmEngine.CbmVidContent.targets" />
+
+    Runtime access:
+
+      using var s = TitleContainer.OpenStream("Content/Video/intro.cbmvid");
+      using var player = new VideoPlayer(s);
+  -->
+
+  <Target Name="_PopulateCbmVidNoneItems"
+          BeforeTargets="AssignTargetPaths"
+          Condition=" '@(CbmVidContent)' != '' ">
+    <ItemGroup>
+      <None Include="@(CbmVidContent)">
+        <Link>%(CbmVidContent.ContentLink)</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+  </Target>
+
+  <PropertyGroup>
+    <CbmVidEncodeToolDll Condition=" '$(CbmVidEncodeToolDll)' == '' ">$(MSBuildThisFileDirectory)..\tools\EncodeCbmVid\bin\$(Configuration)\net10.0\EncodeCbmVid.dll</CbmVidEncodeToolDll>
+  </PropertyGroup>
+
+  <Target Name="ValidateCbmVidContent"
+          BeforeTargets="Build"
+          Inputs="@(CbmVidContent)"
+          Outputs="@(CbmVidContent->'%(FullPath).validated')"
+          Condition=" '@(CbmVidContent)' != '' AND Exists('$(CbmVidEncodeToolDll)') ">
+    <Message Importance="high" Text="Validating .cbmvid: %(CbmVidContent.Identity)" />
+    <Exec Command="dotnet &quot;$(CbmVidEncodeToolDll)&quot; --validate --out &quot;%(CbmVidContent.FullPath)&quot;"
+          IgnoreExitCode="false"
+          ContinueOnError="ErrorAndStop" />
+  </Target>
+
+</Project>

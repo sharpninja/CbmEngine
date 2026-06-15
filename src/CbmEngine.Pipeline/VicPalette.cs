@@ -1,3 +1,7 @@
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.PixelFormats;
+
 namespace CbmEngine.Pipeline;
 
 public static class VicPalette
@@ -22,5 +26,21 @@ public static class VicPalette
             }
         index = -1;
         return false;
+    }
+
+    public static void WritePaletteImage(string outPath)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(outPath);
+        // ffmpeg's paletteuse filter requires exactly 256 pixels: each cell occupies a 4x4 block in a 16x16 image.
+        using var img = new Image<Rgba32>(16, 16);
+        for (int i = 0; i < 256; i++)
+        {
+            int colorIdx = i % 16;
+            var c = Colors[colorIdx];
+            img[i % 16, i / 16] = new Rgba32(c.R, c.G, c.B, 255);
+        }
+        var dir = Path.GetDirectoryName(Path.GetFullPath(outPath));
+        if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
+        img.SaveAsPng(outPath, new PngEncoder());
     }
 }

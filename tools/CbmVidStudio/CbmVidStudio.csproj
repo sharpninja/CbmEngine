@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>CbmEngine.Tools.CbmVidStudio</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4.1" />
+    <PackageReference Include="Myra" Version="1.6.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\CbmEngine.Pipeline\CbmEngine.Pipeline.csproj" />
+    <ProjectReference Include="..\..\src\CbmEngine.Systems\CbmEngine.Systems.csproj" />
+    <ProjectReference Include="..\..\src\CbmEngine.Abstractions\CbmEngine.Abstractions.csproj" />
+    <ProjectReference Include="..\..\external\vice-sharp\src\ViceSharp.RomFetch\ViceSharp.RomFetch.csproj" />
+  </ItemGroup>
+</Project>

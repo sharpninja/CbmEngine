@@ -21,13 +21,15 @@ public class PsidPlayerCartTests
     }
 
     [Fact]
-    public void Cart_CarriesEmbeddedPsidPayloadAt8400()
+    public void Cart_CarriesEmbeddedPsidPayloadAtPayloadSegment()
     {
         var psid = BuildSyntheticPlayingPsid();
         var cart = PsidPlayerCart.Build(psid);
         Assert.Equal(16384, cart.Length);
+        // PAYLOAD segment lives at $AA10 in the cart ROM image (linker config in PsidPlayerCartSource).
+        const int PayloadCartOffset = 0xAA10 - 0x8000;
         for (int i = 0; i < psid.Payload.Length; i++)
-            Assert.Equal(psid.Payload.Span[i], cart[0x0400 + i]);
+            Assert.Equal(psid.Payload.Span[i], cart[PayloadCartOffset + i]);
     }
 
     [Fact]
