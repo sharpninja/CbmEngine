@@ -100,7 +100,7 @@ public static class C64MulticolorBitmapEncoder
     /// <summary>
     /// In-memory multicolor encode of a 320x200 image (the multicolor sampler reads every second
     /// column, so the effective resolution is 160x200). Lets callers encode rendered frames without
-    /// round-tripping through a PNG file.
+    /// round-tripping through a PNG file. Delegates to the raw-span overload.
     /// </summary>
     public static EncodedSplashBitmap Encode(Image<Rgba32> image, byte? forceBackgroundColor = null, string? debugDecodedPngPath = null)
     {
@@ -108,22 +108,45 @@ public static class C64MulticolorBitmapEncoder
         if (image.Width != 320 || image.Height != 200)
             throw new ArgumentException($"Splash image must be 320x200; got {image.Width}x{image.Height}.", nameof(image));
 
-        var pal = new int[Width, Height];
-        var globalHist = new int[16];
+        var pixels = new Rgba32[320 * 200];
         image.ProcessPixelRows(accessor =>
         {
-            for (int y = 0; y < Height; y++)
-            {
-                var row = accessor.GetRowSpan(y);
-                for (int x = 0; x < Width; x++)
-                {
-                    var p = row[x * 2];
-                    int idx = NearestPaletteIndex(p.R, p.G, p.B);
-                    pal[x, y] = idx;
-                    globalHist[idx]++;
-                }
-            }
+            for (int y = 0; y < 200; y++)
+                accessor.GetRowSpan(y).CopyTo(pixels.AsSpan(y * 320, 320));
         });
+
+        var encoded = Encode((ReadOnlySpan<Rgba32>)pixels, 320, 200, forceBackgroundColor);
+        if (debugDecodedPngPath is not null)
+            WriteDebugPreview(encoded, debugDecodedPngPath);
+        return encoded;
+    }
+
+    /// <summary>
+    /// In-memory multicolor encode from a raw row-major 320x200 <see cref="Rgba32"/> span (the
+    /// multicolor sampler reads every second column, so the effective resolution is 160x200). Lets
+    /// callers encode rendered frames without depending on an ImageSharp <see cref="Image{TPixel}"/>.
+    /// </summary>
+    public static EncodedSplashBitmap Encode(ReadOnlySpan<Rgba32> pixels, int width, int height, byte? forceBackgroundColor = null)
+    {
+        if (width != 320)
+            throw new ArgumentException($"Splash image width must be 320; got {width}.", nameof(width));
+        if (height != 200)
+            throw new ArgumentException($"Splash image height must be 200; got {height}.", nameof(height));
+        if (pixels.Length < width * height)
+            throw new ArgumentException($"pixels must contain at least {width * height} entries; got {pixels.Length}.", nameof(pixels));
+
+        var pal = new int[Width, Height];
+        var globalHist = new int[16];
+        for (int y = 0; y < Height; y++)
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                var p = pixels[y * width + x * 2];
+                int idx = NearestPaletteIndex(p.R, p.G, p.B);
+                pal[x, y] = idx;
+                globalHist[idx]++;
+            }
+        }
 
         byte bg = forceBackgroundColor ?? PickBackground(globalHist);
 
@@ -168,10 +191,7 @@ public static class C64MulticolorBitmapEncoder
             }
         }
 
-        var encoded = new EncodedSplashBitmap(SplashBitmapMode.Multicolor, bg, bitmap, screen, color);
-        if (debugDecodedPngPath is not null)
-            WriteDebugPreview(encoded, debugDecodedPngPath);
-        return encoded;
+        return new EncodedSplashBitmap(SplashBitmapMode.Multicolor, bg, bitmap, screen, color);
     }
 
     public static void WriteDebugPreview(EncodedSplashBitmap encoded, string outPath)

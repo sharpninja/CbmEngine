@@ -217,17 +217,5 @@ public static class Program
         return null;
     }
 
-    private static string FindRomBase()
-    {
-        var dir = new DirectoryInfo(AppContext.BaseDirectory);
-        while (dir is not null && !File.Exists(Path.Combine(dir.FullName, "CbmEngine.slnx"))) dir = dir.Parent;
-        if (dir is null)
-        {
-            var probe = new DirectoryInfo(AppContext.BaseDirectory);
-            while (probe is not null && !Directory.Exists(Path.Combine(probe.FullName, "external", "vice-sharp", "native", "vice", "vice", "data"))) probe = probe.Parent;
-            if (probe is null) throw new InvalidOperationException("Could not locate ROM directory.");
-            return Path.Combine(probe.FullName, "external", "vice-sharp", "native", "vice", "vice", "data");
-        }
-        return Path.Combine(dir.FullName, "external", "vice-sharp", "native", "vice", "vice", "data");
-    }
+    private static string FindRomBase() => CbmEngine.Systems.Strategy.RomDiscovery.DiscoverRomBase();
 }

@@ -7,22 +7,13 @@ namespace CbmEngine.Systems.Video;
 
 public sealed class VideoPlayer : IDisposable
 {
-    private const byte D016MulticolorValue = 0xD8;
-    private const byte D016HiResValue = 0xC8;
-    private const ushort RamBitmap = 0x6000;
-    private const ushort RamScreen = 0x4400;
-    private const ushort RamColor = 0xD800;
-    private const ushort D016Address = 0xD016;
-    private const byte ModeSentinel = 0xFF;
-
     private readonly Stream _stream;
     private readonly bool _leaveOpen;
     private readonly long _frameDataStart;
     private readonly byte[] _scratch = new byte[CbmVidFormat.FrameRecordSize];
-    private readonly byte[] _d016Buf = new byte[1];
+    private readonly BitmapFramePump _pump = new();
     private CbmVidHeader _header;
     private int _currentFrame;
-    private byte _lastModeByte = ModeSentinel;
 
     public VideoPlayer(Stream stream, bool leaveOpen = false)
     {
@@ -44,7 +35,7 @@ public sealed class VideoPlayer : IDisposable
         if (!_stream.CanSeek) throw new InvalidOperationException("Underlying stream does not support seeking.");
         _stream.Position = _frameDataStart;
         _currentFrame = 0;
-        _lastModeByte = ModeSentinel;
+        _pump.Reset();
     }
 
     public void Seek(int frameIndex)
@@ -84,17 +75,13 @@ public sealed class VideoPlayer : IDisposable
         }
 
         ReadRecordExact(_currentFrame);
-        byte modeByte = _scratch[0];
-        if (modeByte != _lastModeByte)
-        {
-            _d016Buf[0] = modeByte == (byte)CbmVidFrameMode.HiRes ? D016HiResValue : D016MulticolorValue;
-            memory.WriteIo(D016Address, _d016Buf);
-            _lastModeByte = modeByte;
-        }
-        memory.WriteRange(RamBitmap, _scratch.AsSpan(CbmVidFormat.FrameBitmapOffset, CbmVidFormat.FrameBitmapSize));
-        memory.WriteRange(RamScreen, _scratch.AsSpan(CbmVidFormat.FrameScreenOffset, CbmVidFormat.FrameScreenSize));
-        // Color RAM $D800-$DBE7 is bus-mapped in this engine's memory model; route through IO writes.
-        memory.WriteIo(RamColor, _scratch.AsSpan(CbmVidFormat.FrameColorOffset, CbmVidFormat.FrameColorSize));
+        var mode = _scratch[0] == (byte)CbmVidFrameMode.HiRes ? SplashBitmapMode.HiRes : SplashBitmapMode.Multicolor;
+        _pump.Pump(
+            memory,
+            mode,
+            _scratch.AsSpan(CbmVidFormat.FrameBitmapOffset, CbmVidFormat.FrameBitmapSize),
+            _scratch.AsSpan(CbmVidFormat.FrameScreenOffset, CbmVidFormat.FrameScreenSize),
+            _scratch.AsSpan(CbmVidFormat.FrameColorOffset, CbmVidFormat.FrameColorSize));
         _currentFrame++;
         return true;
     }

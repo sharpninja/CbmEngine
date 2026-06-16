@@ -5,6 +5,7 @@ using CbmEngine.Systems.Sound;
 using ViceSharp.Abstractions;
 using ViceSharp.Architectures.C64;
 using ViceSharp.Chips.VicIi;
+using ViceSharp.Core;
 
 namespace CbmEngine.Systems.Strategy;
 
@@ -19,6 +20,7 @@ public sealed class CommodoreMachine : ICommodoreMachine
     public IClock Clock => Underlying.Clock;
     public IMemoryService Memory { get; }
     public ISoundChipStrategy Sound { get; }
+    public IPubSub PubSub { get; }
 
     public CommodoreMachine(IMachine machine, C64MachineProfile profile)
     {
@@ -28,6 +30,14 @@ public sealed class CommodoreMachine : ICommodoreMachine
 
         VideoChip = machine.Devices.GetByRole(DeviceRole.VideoChip) as IVideoChip
             ?? throw new InvalidOperationException("Built machine has no IVideoChip.");
+
+        // Wire a pub/sub bus to the VIC-II so it emits per-scanline RasterLineEvents. This is the
+        // plumbing for host-driven raster splits (e.g. char-mode bars around a multicolor bitmap).
+        PubSub = new LockFreePubSub();
+        if (VideoChip is Mos6569 vic)
+        {
+            vic.ConnectPubSub(PubSub);
+        }
         AudioChip = machine.Devices.GetByRole(DeviceRole.AudioChip) as IAudioChip;
         KeyboardMatrix = machine.Devices.GetAll<IKeyboardMatrix>() is { Count: > 0 } list ? list[0] : null;
 
