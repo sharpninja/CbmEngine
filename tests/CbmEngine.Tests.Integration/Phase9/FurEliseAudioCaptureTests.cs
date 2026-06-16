@@ -5,7 +5,7 @@ using CbmEngine.Systems.Midi;
 using CbmEngine.Systems.Strategy;
 using CbmEngine.Tests.Integration.Helpers;
 using ViceSharp.Abstractions;
-using ViceSharp.Chips.Media;
+using ViceSharp.Core.Media;
 using SharedRecordingBackend = CbmEngine.Tests.Shared.Helpers.RecordingAudioBackend;
 using Xunit;
 using Xunit.Abstractions;

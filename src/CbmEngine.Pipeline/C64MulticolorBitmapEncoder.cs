@@ -94,8 +94,19 @@ public static class C64MulticolorBitmapEncoder
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(pngPath);
         using var image = Image.Load<Rgba32>(pngPath);
+        return Encode(image, forceBackgroundColor, debugDecodedPngPath);
+    }
+
+    /// <summary>
+    /// In-memory multicolor encode of a 320x200 image (the multicolor sampler reads every second
+    /// column, so the effective resolution is 160x200). Lets callers encode rendered frames without
+    /// round-tripping through a PNG file.
+    /// </summary>
+    public static EncodedSplashBitmap Encode(Image<Rgba32> image, byte? forceBackgroundColor = null, string? debugDecodedPngPath = null)
+    {
+        ArgumentNullException.ThrowIfNull(image);
         if (image.Width != 320 || image.Height != 200)
-            throw new ArgumentException($"Splash image must be 320x200; got {image.Width}x{image.Height}.", nameof(pngPath));
+            throw new ArgumentException($"Splash image must be 320x200; got {image.Width}x{image.Height}.", nameof(image));
 
         var pal = new int[Width, Height];
         var globalHist = new int[16];
