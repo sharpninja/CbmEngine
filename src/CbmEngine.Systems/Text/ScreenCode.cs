@@ -1,20 +1,23 @@
 namespace CbmEngine.Systems.Text;
 
 /// <summary>
-/// Maps ASCII text to C64 screen codes for the uppercase character set: 'A'-'Z' =&gt; 1-26,
-/// '0'-'9' =&gt; $30-$39, space =&gt; $20. Unknown characters map to space.
+/// Maps ASCII text to C64 screen codes for the uppercase character set: 'A'-'Z' =&gt; 1-26 (case
+/// insensitive), and ASCII $20-$3F (space, punctuation, digits, ':;&lt;=&gt;?') maps 1:1 to screen
+/// codes. Anything outside both ranges maps to space.
 /// </summary>
 public static class ScreenCode
 {
     public const byte Space = 0x20;
 
-    /// <summary>Convert one character to a C64 screen code (case-insensitive); unknown =&gt; space.</summary>
+    /// <summary>Convert one character to a C64 screen code (case-insensitive); unmapped =&gt; space.</summary>
     public static byte FromAscii(char c)
     {
         c = char.ToUpperInvariant(c);
         if (c is >= 'A' and <= 'Z') return (byte)(c - 'A' + 1);
-        if (c is >= '0' and <= '9') return (byte)c;        // '0'..'9' == 0x30..0x39
-        if (c == ' ') return Space;
+        // CBMFR-010: ASCII $20-$3F (space, punctuation, digits, ':;<=>?') maps 1:1 to C64 screen
+        // codes. Lets text bars carry the natural ASCII punctuation a game UI normally uses
+        // (e.g. ">", "-") instead of collapsing those characters to space.
+        if (c is >= ' ' and <= '?') return (byte)c;
         return Space;
     }
 
