@@ -9,6 +9,9 @@ public static class CommodoreSystem
 {
     public static readonly IReadOnlyList<string> SupportedProfileIds = new[] { "c64", "c64c", "ntsc", "newntsc" };
 
+    /// <summary>Build a machine using ROMs auto-discovered via <see cref="RomDiscovery"/>.</summary>
+    public static ICommodoreMachine Build(string profileId) => Build(profileId, RomDiscovery.Discover());
+
     public static ICommodoreMachine Build(string profileId, IRomProvider roms)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(profileId);

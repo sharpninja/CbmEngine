@@ -13,5 +13,12 @@ public interface ICommodoreMachine
     IClock Clock { get; }
     IMemoryService Memory { get; }
     ISoundChipStrategy Sound { get; }
+
+    /// <summary>
+    /// Pub/sub bus carrying per-scanline <c>RasterLineEvent</c> notifications from the VIC-II, for
+    /// host-driven raster splits. Connected to the video chip when the machine is assembled.
+    /// </summary>
+    IPubSub PubSub { get; }
+
     void RunFrame();
 }
