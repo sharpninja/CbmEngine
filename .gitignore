@@ -1,6 +1,13 @@
 AGENTS-README-FIRST.yaml
 .mcpServer/
 
+# Agent runtime / tooling scratch (root-level)
+/.grok/
+/agent-tools/
+/cache/
+/mcps/
+/terminals/
+
 # Build output
 bin/
 obj/
