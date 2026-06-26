@@ -1,5 +1,7 @@
 using CbmEngine.Abstractions;
+using CbmEngine.Systems.Strategy;
 using ViceSharp.Abstractions;
+using ViceSharp.RomFetch;
 
 namespace CbmEngine.Systems.Cartridge;
 
@@ -40,5 +42,27 @@ public static class CartridgeBoot
         }
 
         return new CartridgeBootResult(maxFrames, false);
+    }
+
+    /// <summary>
+    /// Engine-provided test harness helper that encapsulates the common pattern:
+    /// CommodoreSystem.Build + marker cart attach + wait for bootstrap marker + GameContext.
+    /// This reduces duplication across unit/integration tests and sample setup.
+    /// (Part of review remediation + BDP harness encapsulation request.)
+    /// </summary>
+    public static (ICommodoreMachine Machine, GameContext Context) CreateBootedTestContext(
+        IRomProvider roms,
+        ReadOnlyMemory<byte>? markerCart = null,
+        string profileId = "c64",
+        int maxFrames = 300)
+    {
+        ArgumentNullException.ThrowIfNull(roms);
+        var cart = markerCart ?? BootstrapCart.BuildMarkerOnly16K();
+        var sys = CommodoreSystem.Build(profileId, roms);
+        var boot = AttachAndWaitForMarker(sys, cart, maxFrames: maxFrames);
+        if (!boot.MarkerSeen)
+            throw new InvalidOperationException($"Test harness marker not seen after {boot.FramesUntilMarker} frames.");
+        var ctx = new GameContext(sys);
+        return (sys, ctx);
     }
 }

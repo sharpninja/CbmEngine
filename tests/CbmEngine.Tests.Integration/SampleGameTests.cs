@@ -12,11 +12,10 @@ public class SampleGameTests
 {
     private static (GameContext Ctx, DemoGame Game) BuildSample()
     {
-        var sys = CommodoreSystem.Build("c64", TestRomProvider.Create());
-        var cart = BootstrapCart.BuildMarkerOnly16K();
-        var boot = CartridgeBoot.AttachAndWaitForMarker(sys, cart, maxFrames: 300);
-        Assert.True(boot.MarkerSeen);
-        var ctx = new GameContext(sys);
+        // Use the engine-provided harness feature (encapsulated per review remediation)
+        // instead of duplicating build + attach + wait + ctx.
+        var roms = TestRomProvider.Create();
+        var (sys, ctx) = CartridgeBoot.CreateBootedTestContext(roms, maxFrames: 300);
         var game = new DemoGame();
         game.Initialize(ctx);
         return (ctx, game);

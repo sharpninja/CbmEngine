@@ -5,6 +5,9 @@
     <ProjectReference Include="..\CbmEngine.Systems\CbmEngine.Systems.csproj" />
     <ProjectReference Include="..\CbmEngine.Abstractions\CbmEngine.Abstractions.csproj" />
     <ProjectReference Include="..\CbmEngine.Pipeline\CbmEngine.Pipeline.csproj" />
+    <!-- ILogger for Console remediation in sample (review + BDP slice) -->
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>

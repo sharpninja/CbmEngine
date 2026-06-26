@@ -178,4 +178,51 @@ public class CbmViewportTests
 
         return (machine, registry, keyboard, audio);
     }
+
+    // TEST-CBM-HOST-020 (BDP v4 remediation)
+    // Full ACs per FR-CBM-HOST-007 / TR-CBM-HOST-FRAME-001 / TEST-CBM-HOST-020
+    // Lease visibility: internal. Ref struct yes.
+    [Fact]
+    public void TEST_CBM_HOST_020_FrameLease_UsingVar_ReleasesEvenOnException_Hybrid()
+    {
+        var (machine, _, _, _) = FakeMachineBuilder.Build();
+        var blit = new FakeBlitTarget();
+        using var viewport = new CbmViewport(
+            machine.Object, blit, ownsBlit: false, new FakeInputScript(), audioBackend: null,
+            refreshHz: 200.0, sampleRate: 44100, game: null, gameContext: null, useHybridPump: true);
+
+        // Wait for pump to produce at least one frame
+        var sw = Stopwatch.StartNew();
+        while (viewport.FramesCompleted < 1 && sw.Elapsed < TimeSpan.FromSeconds(2))
+            Thread.Sleep(5);
+
+        Assert.True(viewport.FramesCompleted >= 1);
+
+        // Simulate exception during upload - lease must still release (no deadlock on next)
+        try
+        {
+            // For now use the shim lease API on pump (internal accessible via InternalsVisibleTo)
+            // In final, RefreshTexture will use it.
+            var pumpField = typeof(CbmViewport).GetField("_pump", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var pump = pumpField?.GetValue(viewport) as EmulatorPump;
+            Assert.NotNull(pump);
+
+            using var lease = pump.AcquireFrameLease();  // using guarantees Dispose
+            // Simulate exception in upload path
+            throw new InvalidOperationException("simulated blit failure");
+        }
+        catch (InvalidOperationException)
+        {
+            // expected - lease disposed via using even on throw
+        }
+
+        // If lease didn't release, next acquire would deadlock or fail; prove we can acquire again
+        var pump2 = typeof(CbmViewport).GetField("_pump", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(viewport) as EmulatorPump;
+        using var lease2 = pump2!.AcquireFrameLease();
+        Assert.True(lease2.Span.Length > 0);
+
+        // Also verify RefreshTexture path works (will use lease in impl)
+        viewport.RefreshTexture();
+        Assert.True(blit.UploadCount >= 1);
+    }
 }

@@ -190,15 +190,10 @@ public sealed class CbmViewport : IDisposable
     {
         if (_pump is not null)
         {
-            try
-            {
-                var frame = _pump.AcquireFrameForUpload();
-                _blit.Upload(frame, _pump.FrameWidth, _pump.FrameHeight);
-            }
-            finally
-            {
-                _pump.ReleaseFrame();
-            }
+            // Use the safe lease (internal) - guarantees release via Dispose even on exception.
+            // Per BDP remediation of the brittle manual Monitor pattern.
+            using var lease = _pump.AcquireFrameLease();
+            _blit.Upload(lease.Span, _pump.FrameWidth, _pump.FrameHeight);
         }
         else
         {

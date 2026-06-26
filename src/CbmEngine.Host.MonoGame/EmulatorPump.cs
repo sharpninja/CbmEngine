@@ -138,4 +138,40 @@ public sealed class EmulatorPump : IDisposable
     }
 
     private readonly record struct KeyEvent(byte MatrixCode, bool Pressed);
+
+    /// <summary>
+    /// Internal disposable lease for safe framebuffer access from the pump's visible buffer.
+    /// Guarantees release of the underlying synchronization primitive when disposed (even on exceptions).
+    /// Visibility internal per review feedback. Implemented as ref struct for zero-alloc.
+    /// </summary>
+    internal readonly ref struct FrameLease : IDisposable
+    {
+        private readonly EmulatorPump _owner;
+
+        public ReadOnlySpan<byte> Span { get; }
+
+        internal FrameLease(EmulatorPump owner, ReadOnlySpan<byte> span)
+        {
+            _owner = owner;
+            Span = span;
+        }
+
+        public void Dispose()
+        {
+            _owner?.ReleaseFromLease();
+        }
+    }
+
+    // Acquire now enters the lock and returns owning lease (real impl after BDP stub validation).
+    // Internal per review feedback (Lease visibility: Internal).
+    internal FrameLease AcquireFrameLease()
+    {
+        Monitor.Enter(_visibleLock);
+        return new FrameLease(this, _visibleBuffer);
+    }
+
+    private void ReleaseFromLease()
+    {
+        Monitor.Exit(_visibleLock);
+    }
 }
