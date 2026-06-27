@@ -16,6 +16,7 @@ public sealed class MusicService
 
     private readonly ICommodoreMachine _machine;
     private readonly Mos6502 _cpu;
+    private KernalBypass? _bypass;
     private PsidProgram? _program;
     private int _song = 1;
     private bool _isPlaying;
@@ -83,6 +84,34 @@ public sealed class MusicService
         NativeIrqDriverInstalled = true;
     }
 
+    /// <summary>
+    /// KERNAL-independent counterpart to <see cref="InstallNativeIrqDriver"/>: drives PLAY from a
+    /// stand-alone RAM IRQ handler while the KERNAL ROM is banked out via <see cref="KernalBypass"/>.
+    /// With the KERNAL gone, its editor idle loop can no longer re-run CINT (~$E5B0) and reset the VIC
+    /// mid-frame, which is what flashed a frame of char-mode garbage in a host that drives the VIC
+    /// itself. The 6510 is parked and only the music IRQ runs. The CIA1 timer that fires the IRQ keeps
+    /// running from the KERNAL's boot setup, so call this AFTER the KERNAL has finished booting and
+    /// AFTER <see cref="Install"/> (so PLAY exists).
+    /// </summary>
+    public void InstallStandaloneIrqDriver(
+        ushort handlerAddress = KernalBypass.DefaultIrqHandlerAddress,
+        ushort parkAddress = KernalBypass.DefaultParkAddress,
+        ushort nmiAddress = KernalBypass.DefaultNmiAddress)
+    {
+        if (_program is null) throw new InvalidOperationException("Install PSID first.");
+        if (_program.Header.PlayAddress == 0) throw new InvalidOperationException("PSID has no play address.");
+        if (handlerAddress <= 0x00FF) throw new ArgumentException("Handler address must be outside zero page.", nameof(handlerAddress));
+
+        // The music IRQ handler (saves regs, acks VIC+CIA, JSR PLAY, RTI) goes in RAM; the generic
+        // KERNAL-bypass feature banks the KERNAL out and routes the hardware IRQ vector to it.
+        _machine.Memory.WriteRange(handlerAddress, StandaloneIrqStub.BuildHandler(_program.Header.PlayAddress));
+        _bypass ??= new KernalBypass(_machine);
+        _bypass.Engage(irqHandlerAddress: handlerAddress, parkAddress: parkAddress, nmiAddress: nmiAddress);
+
+        NativeIrqDriverInstalled = true;
+        NativeIrqStubAddress = handlerAddress;
+    }
+
     public void SetSong(int subTune)
     {
         if (_program is null) throw new InvalidOperationException("No PSID installed.");
@@ -94,8 +123,15 @@ public sealed class MusicService
         _isPlaying = false;
         if (NativeIrqDriverInstalled)
         {
-            _machine.Bus.Write(0x0314, 0x31);
-            _machine.Bus.Write(0x0315, 0xEA);
+            if (_bypass is { Engaged: true })
+            {
+                _bypass.Disengage();   // restores the KERNAL ROM + standard IRQ vector
+            }
+            else
+            {
+                _machine.Bus.Write(0x0314, 0x31);
+                _machine.Bus.Write(0x0315, 0xEA);
+            }
             NativeIrqDriverInstalled = false;
         }
         _machine.Sound.SilenceAll();
