@@ -84,14 +84,22 @@ public sealed class MusicService
         NativeIrqDriverInstalled = true;
     }
 
+    // CIA1 Timer A latch for one PAL frame ($4CC7 = 19655 cycles, ~50.12 Hz) - the exact value the
+    // PsidPlayerCart uses so PLAY runs at the PAL VBI rate, not the KERNAL's ~60 Hz jiffy.
+    private const byte PalFrameTimerLo = 0xC7;
+    private const byte PalFrameTimerHi = 0x4C;
+
     /// <summary>
     /// KERNAL-independent counterpart to <see cref="InstallNativeIrqDriver"/>: drives PLAY from a
     /// stand-alone RAM IRQ handler while the KERNAL ROM is banked out via <see cref="KernalBypass"/>.
     /// With the KERNAL gone, its editor idle loop can no longer re-run CINT (~$E5B0) and reset the VIC
     /// mid-frame, which is what flashed a frame of char-mode garbage in a host that drives the VIC
-    /// itself. The 6510 is parked and only the music IRQ runs. The CIA1 timer that fires the IRQ keeps
-    /// running from the KERNAL's boot setup, so call this AFTER the KERNAL has finished booting and
-    /// AFTER <see cref="Install"/> (so PLAY exists).
+    /// itself. The 6510 is parked and only the music IRQ runs.
+    ///
+    /// CIA1 Timer A is reprogrammed to one PAL frame ($4CC7) and re-armed as the sole IRQ source - the
+    /// same setup <see cref="ViceSharp"/>'s PSID player cart uses - so PLAY runs at the PAL 50 Hz rate
+    /// the scores are written for, not the KERNAL's ~60 Hz jiffy (which played them 1.2x fast). Call
+    /// AFTER the KERNAL has finished booting and AFTER <see cref="Install"/> (so PLAY exists).
     /// </summary>
     public void InstallStandaloneIrqDriver(
         ushort handlerAddress = KernalBypass.DefaultIrqHandlerAddress,
@@ -107,6 +115,23 @@ public sealed class MusicService
         _machine.Memory.WriteRange(handlerAddress, StandaloneIrqStub.BuildHandler(_program.Header.PlayAddress));
         _bypass ??= new KernalBypass(_machine);
         _bypass.Engage(irqHandlerAddress: handlerAddress, parkAddress: parkAddress, nmiAddress: nmiAddress);
+
+        // Reprogram CIA1 Timer A to the PAL frame period and re-arm it as the only interrupt source so
+        // PLAY fires once per frame (50 Hz). This MUST run as 6502 code (executed on the CPU), not host
+        // bus writes: the timer's force-load is a CIA pipeline event that only advances while the chip
+        // is clocked, and a bus poke does not clock it - so a poked latch keeps the KERNAL's 60 Hz
+        // counter. Mirrors PsidPlayerCart's CIA setup exactly.
+        const ushort ciaSetup = KernalBypass.DefaultIrqHandlerAddress + 0x40;   // free RAM past the handler
+        _machine.Memory.WriteRange(ciaSetup, new byte[]
+        {
+            0xA9, PalFrameTimerLo, 0x8D, 0x04, 0xDC,   // LDA #lo   STA $DC04
+            0xA9, PalFrameTimerHi, 0x8D, 0x05, 0xDC,   // LDA #hi   STA $DC05  (latch = $4CC7)
+            0xA9, 0x7F,           0x8D, 0x0D, 0xDC,     // LDA #$7F  STA $DC0D  (clear all CIA1 masks)
+            0xA9, 0x81,           0x8D, 0x0D, 0xDC,     // LDA #$81  STA $DC0D  (enable Timer A IRQ)
+            0xA9, 0x11,           0x8D, 0x0E, 0xDC,     // LDA #$11  STA $DC0E  (start TA, force-load latch)
+            0x60,                                       // RTS
+        });
+        RunRoutine(ciaSetup, aReg: 0);
 
         NativeIrqDriverInstalled = true;
         NativeIrqStubAddress = handlerAddress;
