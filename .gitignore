@@ -30,6 +30,7 @@ scaffold-run.log
 TestResults/
 *.trx
 aiunit-results/
+.nuke/temp/
 
 # OS junk
 Thumbs.db

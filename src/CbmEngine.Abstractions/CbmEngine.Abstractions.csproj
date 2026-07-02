@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\external\vice-sharp\src\ViceSharp.Abstractions\ViceSharp.Abstractions.csproj" />
+    <PackageReference Include="ViceSharp.Core" Version="0.9.0" />
   </ItemGroup>
 
   <PropertyGroup>

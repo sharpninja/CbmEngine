@@ -14,6 +14,7 @@
     <PackageReference Include="SixLabors.ImageSharp" Version="2.1.13" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <PackageReference Include="ViceSharp.Core" Version="0.9.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,10 +25,6 @@
     <ProjectReference Include="..\..\src\CbmEngine.Abstractions\CbmEngine.Abstractions.csproj" />
     <ProjectReference Include="..\..\src\CbmEngine.Systems\CbmEngine.Systems.csproj" />
     <ProjectReference Include="..\..\src\CbmEngine.Pipeline\CbmEngine.Pipeline.csproj" />
-    <ProjectReference Include="..\..\external\vice-sharp\src\ViceSharp.Abstractions\ViceSharp.Abstractions.csproj" />
-    <ProjectReference Include="..\..\external\vice-sharp\src\ViceSharp.Core\ViceSharp.Core.csproj" />
-    <ProjectReference Include="..\..\external\vice-sharp\src\ViceSharp.Chips\ViceSharp.Chips.csproj" />
-    <ProjectReference Include="..\..\external\vice-sharp\src\ViceSharp.Architectures\ViceSharp.Architectures.csproj" />
     <ProjectReference Include="..\..\src\CbmEngine.Host.MonoGame\CbmEngine.Host.MonoGame.csproj" />
     <ProjectReference Include="..\CbmEngine.Tests.Shared\CbmEngine.Tests.Shared.csproj" />
     <ProjectReference Include="..\..\src\CbmEngine.Game.Sample\CbmEngine.Game.Sample.csproj" />

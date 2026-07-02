@@ -1,17 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\external\vice-sharp\src\ViceSharp.Abstractions\ViceSharp.Abstractions.csproj" />
-    <ProjectReference Include="..\..\external\vice-sharp\src\ViceSharp.Core\ViceSharp.Core.csproj" />
-    <ProjectReference Include="..\..\external\vice-sharp\src\ViceSharp.Chips\ViceSharp.Chips.csproj" />
-    <ProjectReference Include="..\..\external\vice-sharp\src\ViceSharp.Architectures\ViceSharp.Architectures.csproj" />
-    <ProjectReference Include="..\..\external\vice-sharp\src\ViceSharp.RomFetch\ViceSharp.RomFetch.csproj" />
     <ProjectReference Include="..\CbmEngine.Abstractions\CbmEngine.Abstractions.csproj" />
     <ProjectReference Include="..\CbmEngine.Pipeline\CbmEngine.Pipeline.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="SixLabors.ImageSharp" Version="2.1.13" />
+    <PackageReference Include="ViceSharp.Core" Version="0.9.0" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -4,5 +4,13 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
+    <RepositoryUrl>https://github.com/sharpninja/CbmEngine</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Authors>Sharp Ninja</Authors>
+    <Company>Sharp Ninja</Company>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GitVersion.MsBuild" Version="6.8.0" PrivateAssets="all" />
+  </ItemGroup>
 </Project>
