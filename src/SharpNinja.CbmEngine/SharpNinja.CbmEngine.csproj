@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <PackageId>SharpNinja.CbmEngine</PackageId>
+    <Title>CbmEngine</Title>
+    <Description>.NET 10 Commodore 64 game and media engine backed by ViceSharp emulation, with C64 memory, VIC-II, SID, cartridge, video, and MonoGame host surfaces.</Description>
+    <PackageTags>c64;commodore-64;vic-ii;sid;monogame;emulation;games</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CbmEngine.Abstractions\CbmEngine.Abstractions.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\CbmEngine.Pipeline\CbmEngine.Pipeline.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\CbmEngine.Systems\CbmEngine.Systems.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\CbmEngine.Host.MonoGame\CbmEngine.Host.MonoGame.csproj" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.Content.Pipeline" Version="3.8.4.1" />
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4.1" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.13" />
+    <PackageReference Include="ViceSharp.Core" Version="0.9.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\CbmEngine.Abstractions\bin\$(Configuration)\$(TargetFramework)\CbmEngine.Abstractions.dll" Pack="true" PackagePath="lib\$(TargetFramework)\" />
+    <None Include="..\CbmEngine.Pipeline\bin\$(Configuration)\$(TargetFramework)\CbmEngine.Pipeline.dll" Pack="true" PackagePath="lib\$(TargetFramework)\" />
+    <None Include="..\CbmEngine.Systems\bin\$(Configuration)\$(TargetFramework)\CbmEngine.Systems.dll" Pack="true" PackagePath="lib\$(TargetFramework)\" />
+    <None Include="..\CbmEngine.Host.MonoGame\bin\$(Configuration)\$(TargetFramework)\CbmEngine.Host.MonoGame.dll" Pack="true" PackagePath="lib\$(TargetFramework)\" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

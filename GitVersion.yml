@@ -1,0 +1,14 @@
+next-version: 0.5.0
+mode: ContinuousDelivery
+assembly-versioning-scheme: MajorMinorPatch
+assembly-file-versioning-scheme: MajorMinorPatchTag
+update-build-number: true
+branches:
+  main:
+    regex: ^master$|^main$
+    label: ""
+    increment: Patch
+    is-main-branch: true
+    pre-release-weight: 55000
+    prevent-increment:
+      of-merged-branch: true
