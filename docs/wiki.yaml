@@ -1,0 +1,149 @@
+schema: mcp-wiki-export/v1
+home:
+  document: home
+documents:
+- id: home
+  title: Home
+  source: generated:home
+  target: Home.md
+  platforms:
+  - github
+  - azure
+- id: functional
+  title: Functional Requirements
+  source: generated:functional
+  target: Functional-Requirements.md
+  platforms:
+  - github
+  - azure
+- id: technical
+  title: Technical Requirements
+  source: generated:technical
+  target: Technical-Requirements.md
+  platforms:
+  - github
+  - azure
+- id: testing
+  title: Testing Requirements
+  source: generated:testing
+  target: Testing-Requirements.md
+  platforms:
+  - github
+  - azure
+- id: mapping
+  title: TR per FR Mapping
+  source: generated:mapping
+  target: TR-per-FR-Mapping.md
+  platforms:
+  - github
+  - azure
+- id: matrix
+  title: Requirements Matrix
+  source: generated:matrix
+  target: Requirements-Matrix.md
+  platforms:
+  - github
+  - azure
+- id: getting-started
+  title: Getting Started
+  source: docs/getting-started.md
+  target: Getting-Started.md
+  platforms:
+  - github
+  - azure
+- id: architecture
+  title: Architecture
+  source: docs/architecture.md
+  target: Architecture.md
+  platforms:
+  - github
+  - azure
+- id: memory-and-io
+  title: Memory and I/O
+  source: docs/memory-and-io.md
+  target: Memory-and-IO.md
+  platforms:
+  - github
+  - azure
+- id: graphics-sprites-tilemap
+  title: 'Graphics: Sprites and Tilemap'
+  source: docs/graphics-sprites-tilemap.md
+  target: Graphics-Sprites-Tilemap.md
+  platforms:
+  - github
+  - azure
+- id: audio-and-sid
+  title: Audio and SID
+  source: docs/audio-and-sid.md
+  target: Audio-and-SID.md
+  platforms:
+  - github
+  - azure
+- id: midi-to-sid
+  title: MIDI to SID
+  source: docs/midi-to-sid.md
+  target: MIDI-to-SID.md
+  platforms:
+  - github
+  - azure
+- id: cbmvid-format
+  title: CbmVid Video Format
+  source: docs/cbmvid-format.md
+  target: CbmVid-Format.md
+  platforms:
+  - github
+  - azure
+- id: cartridges-and-crt
+  title: Cartridges and .CRT
+  source: docs/cartridges-and-crt.md
+  target: Cartridges-and-CRT.md
+  platforms:
+  - github
+  - azure
+- id: tools
+  title: Tools
+  source: docs/tools.md
+  target: Tools.md
+  platforms:
+  - github
+  - azure
+- id: api-reference
+  title: API Reference
+  source: docs/api-reference.md
+  target: API-Reference.md
+  platforms:
+  - github
+  - azure
+navigation:
+- document: home
+  children: []
+- document: functional
+  children: []
+- document: technical
+  children: []
+- document: testing
+  children: []
+- document: mapping
+  children: []
+- document: matrix
+  children: []
+- document: getting-started
+  children: []
+- document: architecture
+  children: []
+- document: memory-and-io
+  children: []
+- document: graphics-sprites-tilemap
+  children: []
+- document: audio-and-sid
+  children: []
+- document: midi-to-sid
+  children: []
+- document: cbmvid-format
+  children: []
+- document: cartridges-and-crt
+  children: []
+- document: tools
+  children: []
+- document: api-reference
+  children: []

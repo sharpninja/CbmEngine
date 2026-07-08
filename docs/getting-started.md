@@ -8,20 +8,22 @@ your own first game.
 | Requirement | Why | Notes |
 |-------------|-----|-------|
 | .NET 10 SDK | Everything targets `net10.0`. | `dotnet --version` should report 10.x. |
-| Git (with submodules) | The ViceSharp emulation core lives in `external/vice-sharp`. | Clone with `--recurse-submodules`, or run `git submodule update --init --recursive`. |
+| Git | Cloning the repo. | A plain `git clone`; there are no git submodules. |
 | CC65 toolchain (`ca65`, `ld65`) | Required only to build `.CRT` cartridges (the default demo, PSID carts, bitmap carts). | Install from [cc65.github.io](https://cc65.github.io) and put `ca65`/`ld65` on your `PATH`. Not needed for MIDI or for the engine API itself. |
 | FFmpeg | Required only to encode video (not GIF or PNG) into CbmVid. | On `PATH`, or pass an explicit path to the tool. |
 
-The VICE ROMs (`kernal`, `basic`, `chargen`) ship inside the `vice-sharp`
-submodule at `external/vice-sharp/native/vice/vice/data`. The sample app finds
-them automatically by walking up from the executable to the directory holding
-`CbmEngine.slnx`. If you embed the engine elsewhere, point `RomProvider` at that
-data directory yourself (see step 5).
+The VICE ROMs (`kernal`, `basic`, `chargen`) are downloaded on demand the first
+time the engine needs them and cached under `%LOCALAPPDATA%/CbmEngine/roms`
+(fetched via the ViceSharp locator and SHA256-verified). Nothing to check in or
+vendor. The sample app and the hosts resolve them for you via
+`RomDiscovery.DiscoverOrDownloadAsync()`; set the `CBMENGINE_ROM_BASE`
+environment variable to an existing ROM directory to supply your own instead of
+downloading (see step 5).
 
 ## 2. Build
 
 ```bash
-git clone --recurse-submodules https://github.com/sharpninja/CbmEngine.git
+git clone https://github.com/sharpninja/CbmEngine.git
 cd CbmEngine
 dotnet build CbmEngine.slnx
 ```
@@ -113,10 +115,11 @@ Build a C64 system, wrap it in a `GameContext`, and hand both to a
 ```csharp
 using CbmEngine.Host.MonoGame;
 using CbmEngine.Systems;
-using ViceSharp.RomFetch;
+using CbmEngine.Systems.Strategy;   // RomDiscovery
 
-// Point RomProvider at the VICE data directory (kernal/basic/chargen).
-var roms = new RomProvider(@"external/vice-sharp/native/vice/vice/data");
+// Resolve the C64 ROMs (kernal/basic/chargen), downloading + caching them on
+// first run, or honoring CBMENGINE_ROM_BASE if you supply your own directory.
+var roms = await RomDiscovery.DiscoverOrDownloadAsync();
 
 // Build a PAL C64. Supported profile ids: "c64", "c64c", "ntsc", "newntsc".
 var sys = CommodoreSystem.Build("c64", roms);

@@ -1,3 +1,4 @@
+using System.Linq;
 using CbmEngine.Abstractions;
 using CbmEngine.Host.MonoGame;
 using CbmEngine.Systems.Strategy;
@@ -81,15 +82,29 @@ public class SoundStrategyTests
         var pump = new SidPump(sys.AudioChip!, backend, 44100, 50.125);
         for (int i = 0; i < 25; i++) { sys.RunFrame(); pump.PumpFrame(); }
 
+        // Playing: the gated triangle voice produces a real audio swing.
+        var playing = backend.Samples.ToArray();
+        float playingPeakToPeak = playing.Max() - playing.Min();
+
         sys.Sound.SilenceAll();
         backend.Stop();
 
-        for (int i = 0; i < 5; i++) { sys.RunFrame(); pump.PumpFrame(); }
+        // The bit-exact 6581 reSID model (ViceSharp.Core >= 1.0.0) has a real release-envelope tail plus a
+        // brief DC settle after SilenceAll, so silence is not instantaneous (rate-4 release spans ~6 frames).
+        // Give it time to decay, then assert the settled tail is flat. Peak-to-peak is used because it is
+        // DC-invariant: the 6581's static DC bias is inaudible and must not count as sound.
+        for (int i = 0; i < 15; i++) { sys.RunFrame(); pump.PumpFrame(); }
 
-        int audible = 0;
-        for (int i = 0; i < backend.Samples.Count; i++)
-            if (Math.Abs(backend.Samples[i]) > 0.001f) audible++;
-        Assert.True(audible < backend.Samples.Count / 10, $"Post-Silence audible={audible} of {backend.Samples.Count} should be <10%.");
+        var silenced = backend.Samples;
+        Assert.NotEmpty(silenced);
+        int settledCount = Math.Max(1, silenced.Count / 3);
+        var settled = silenced.Skip(silenced.Count - settledCount).ToArray();
+        float settledPeakToPeak = settled.Max() - settled.Min();
+
+        Assert.True(playingPeakToPeak > 0.05f,
+            $"Sanity: playing peak-to-peak={playingPeakToPeak:F4} should be well above the noise floor.");
+        Assert.True(settledPeakToPeak < 0.001f,
+            $"Post-Silence settled peak-to-peak={settledPeakToPeak:F4} (last {settledCount} samples) should be at the noise floor.");
     }
 
     [Fact]

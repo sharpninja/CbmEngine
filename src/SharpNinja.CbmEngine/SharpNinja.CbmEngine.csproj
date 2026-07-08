@@ -22,7 +22,7 @@
     <PackageReference Include="MonoGame.Framework.Content.Pipeline" Version="3.8.4.1" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4.1" />
     <PackageReference Include="SixLabors.ImageSharp" Version="2.1.13" />
-    <PackageReference Include="ViceSharp.Core" Version="0.9.0" />
+    <PackageReference Include="ViceSharp.Core" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>

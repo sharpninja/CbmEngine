@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -14,7 +14,7 @@
     <PackageReference Include="SixLabors.ImageSharp" Version="2.1.13" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
-    <PackageReference Include="ViceSharp.Core" Version="0.9.0" />
+    <PackageReference Include="ViceSharp.Core" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,8 +30,6 @@
     <ProjectReference Include="..\..\src\CbmEngine.Game.Sample\CbmEngine.Game.Sample.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\..\external\vice-sharp\native\vice_x64.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" Condition="Exists('..\..\external\vice-sharp\native\vice_x64.dll')" />
-  </ItemGroup>
+  <!-- The native VICE lib comes from the ViceSharp.Core nuget; no longer copied from the vice-sharp submodule. -->
 
 </Project>

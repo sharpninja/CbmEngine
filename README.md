@@ -53,7 +53,7 @@ Start here, then dive into the subsystem you need:
 
 ```bash
 # Prerequisites: .NET 10 SDK, and (for cartridges) the CC65 toolchain on PATH.
-git clone --recurse-submodules https://github.com/sharpninja/CbmEngine.git
+git clone https://github.com/sharpninja/CbmEngine.git
 cd CbmEngine
 dotnet build CbmEngine.slnx
 
@@ -67,8 +67,9 @@ dotnet run --project src/CbmEngine.Game.Sample -- --midi=fixtures/midi/fur_elise
 dotnet run --project src/CbmEngine.Game.Sample -- --video=assets/video/intro.cbmvid
 ```
 
-See [Getting Started](docs/getting-started.md) for the full setup, including
-where the VICE ROMs come from and how to install the `cbmvid` content tool.
+See [Getting Started](docs/getting-started.md) for the full setup, including how
+the VICE ROMs are downloaded and cached on first run and how to install the
+`cbmvid` content tool.
 
 ## Solution layout
 
@@ -81,8 +82,11 @@ src/
   CbmEngine.Game.Sample      The runnable sample (Frost Point demo, MIDI, video)
 tools/                       cbmvid CLI/GUI, fixture builders, capture analyzers
 tests/                       Unit and integration tests
-external/vice-sharp          The ViceSharp emulation core (git submodule)
 ```
+
+The ViceSharp emulation core (VIC-II / SID / 6510) is a NuGet dependency
+(`ViceSharp.Core`); there is no git submodule to initialize, and the C64 ROMs
+are downloaded on demand and cached per-user on first run.
 
 ## License and credits
 

@@ -123,11 +123,20 @@ public sealed class StudioGame : Game
 
     private void InitializeEmulator()
     {
-        string? romBase = StudioRoms.Resolve();
+        string? romBase;
+        try
+        {
+            romBase = StudioRoms.ResolveOrDownloadAsync().GetAwaiter().GetResult();
+        }
+        catch (Exception ex)
+        {
+            StudioDiag.Log($"emulator: ROM acquisition failed: {ex.Message}");
+            romBase = null;
+        }
         if (romBase is null)
         {
-            StudioDiag.Log("emulator: no ROMs found (bundled/env/repo all missed)");
-            _ui!.SetStatus($"Emulator preview disabled: C64 ROMs not found. Set {StudioRoms.EnvVar} to a VICE data directory.");
+            StudioDiag.Log("emulator: no ROMs found (bundled/env/cache all missed, download failed)");
+            _ui!.SetStatus($"Emulator preview disabled: C64 ROMs not available. Set {StudioRoms.EnvVar} to a VICE data directory.");
             return;
         }
         try
@@ -307,8 +316,7 @@ public sealed class StudioGame : Game
                 var tempCbmvid = Path.Combine(Path.GetTempPath(), $"cbmvid-gif-{Guid.NewGuid():N}.cbmvid");
                 manifest = manifest with { OutputPath = tempCbmvid };
                 CbmVidEncoder.Encode(manifest);
-                string romBase = StudioRoms.Resolve()
-                    ?? throw new InvalidOperationException($"C64 ROMs not found; set {StudioRoms.EnvVar}.");
+                string romBase = StudioRoms.ResolveOrDownloadAsync().GetAwaiter().GetResult();
                 var roms = new RomProvider(romBase);
                 CbmVidGifExporter.Export(tempCbmvid, fd.FilePath, roms, log: msg => _ui!.SetStatus(msg));
                 try { File.Delete(tempCbmvid); } catch { }

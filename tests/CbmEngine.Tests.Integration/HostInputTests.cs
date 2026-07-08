@@ -25,8 +25,7 @@ public class HostInputTests
     [Fact]
     public void TEST_CBM_HOST_003_KeyPress_AppearsInKeyboardBufferWithinTenFrames()
     {
-        var romBase = Path.Combine(BootSpikeTests.RepoRootPublic, "external", "vice-sharp", "native", "vice", "vice", "data");
-        var roms = new RomProvider(romBase);
+        var roms = Helpers.TestRomProvider.Create();
         var result = BootRunner.Run(C64MachineProfiles.C64Pal, roms, framesToWarm: 180);
         var machine = result.Machine;
         var bus = machine.Bus;

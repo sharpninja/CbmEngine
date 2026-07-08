@@ -16,9 +16,6 @@ public class BootSpikeTests
 
     public static string RepoRootPublic => FindRepoRoot();
 
-    private static string RomBasePath =>
-        Path.Combine(RepoRoot, "external", "vice-sharp", "native", "vice", "vice", "data");
-
     private static string ArtifactsDir => Path.Combine(RepoRoot, "artifacts", "phase0");
 
     private static string FindRepoRoot()
@@ -34,7 +31,7 @@ public class BootSpikeTests
     [Fact]
     public void TEST_CBM_BOOT_001_ReadyScreen_AppearsAfterWarmup_AndIsWrittenToPng()
     {
-        var roms = new RomProvider(RomBasePath);
+        var roms = Helpers.TestRomProvider.Create();
         Directory.CreateDirectory(ArtifactsDir);
 
         var result = BootRunner.Run(C64MachineProfiles.C64Pal, roms, WarmupFrames);
@@ -56,7 +53,7 @@ public class BootSpikeTests
     [Fact]
     public void TEST_CBM_BOOT_003_BaselineFrameHash_IsDeterministic()
     {
-        var roms = new RomProvider(RomBasePath);
+        var roms = Helpers.TestRomProvider.Create();
         Directory.CreateDirectory(ArtifactsDir);
 
         string Hash()

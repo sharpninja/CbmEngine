@@ -4,50 +4,43 @@ using ViceSharp.RomFetch;
 namespace CbmEngine.Systems.Strategy;
 
 /// <summary>
-/// Locates the bundled VICE ROM data directory so each host does not reinvent path-walking.
-/// Resolution order: the <see cref="RomBaseEnvVar"/> environment variable, then a walk up to the
-/// repository solution file (<c>CbmEngine.slnx</c>), then a direct walk up looking for the data dir.
+/// Resolves the C64 ROM base directory and, on demand, downloads missing ROMs into it.
+/// Resolution order: the <see cref="RomBaseEnvVar"/> environment variable if it points at an existing
+/// directory, otherwise the per-user cache (<see cref="RomCache.DefaultBasePath"/>) which the
+/// download-on-demand path populates. ROMs are no longer taken from a vice-sharp source checkout.
 /// </summary>
 public static class RomDiscovery
 {
     /// <summary>Environment variable that, when set to an existing directory, overrides discovery.</summary>
     public const string RomBaseEnvVar = "CBMENGINE_ROM_BASE";
 
-    private static readonly string[] DataDirParts =
-        { "external", "vice-sharp", "native", "vice", "vice", "data" };
-
-    /// <summary>Resolve the ROM base directory. <paramref name="startDir"/> defaults to the app base dir.</summary>
+    /// <summary>Resolve the ROM base directory (env override, else the per-user cache). Never throws.</summary>
     public static string DiscoverRomBase(string? startDir = null)
     {
         var env = Environment.GetEnvironmentVariable(RomBaseEnvVar);
         if (!string.IsNullOrWhiteSpace(env) && Directory.Exists(env))
             return env;
 
-        var start = startDir ?? AppContext.BaseDirectory;
-        var relativeDataDir = Path.Combine(DataDirParts);
-
-        // Prefer a tree rooted at the solution file.
-        for (var dir = new DirectoryInfo(start); dir is not null; dir = dir.Parent)
-        {
-            if (File.Exists(Path.Combine(dir.FullName, "CbmEngine.slnx")))
-            {
-                var candidate = Path.Combine(dir.FullName, relativeDataDir);
-                if (Directory.Exists(candidate)) return candidate;
-            }
-        }
-
-        // Fallback: walk up looking for the data dir directly.
-        for (var dir = new DirectoryInfo(start); dir is not null; dir = dir.Parent)
-        {
-            var candidate = Path.Combine(dir.FullName, relativeDataDir);
-            if (Directory.Exists(candidate)) return candidate;
-        }
-
-        throw new InvalidOperationException(
-            $"Could not locate the bundled VICE ROM data directory starting from '{start}'. " +
-            $"Set the {RomBaseEnvVar} environment variable to a ROM base directory, or run from within the CbmEngine repository.");
+        return RomCache.DefaultBasePath;
     }
 
-    /// <summary>Discover the ROM base and return an <see cref="IRomProvider"/> rooted there.</summary>
+    /// <summary>Discover the ROM base and return an <see cref="IRomProvider"/> rooted there (no download).</summary>
     public static IRomProvider Discover(string? startDir = null) => new RomProvider(DiscoverRomBase(startDir));
+
+    /// <summary>Resolve the ROM base and download any missing C64 ROMs into it; returns the base directory.</summary>
+    public static async Task<string> EnsureRomBaseAsync(
+        string? startDir = null, CancellationToken cancellationToken = default)
+    {
+        var baseDir = DiscoverRomBase(startDir);
+        await RomAcquisition.EnsureC64RomsAsync(new RomProviderAcquirer(new RomProvider(baseDir)), cancellationToken);
+        return baseDir;
+    }
+
+    /// <summary>
+    /// Resolve the ROM base, download any missing C64 ROMs into it via the locator, and return a provider
+    /// rooted there. This is the reliable path for hosts that may run without ROMs already present.
+    /// </summary>
+    public static async Task<IRomProvider> DiscoverOrDownloadAsync(
+        string? startDir = null, CancellationToken cancellationToken = default)
+        => new RomProvider(await EnsureRomBaseAsync(startDir, cancellationToken));
 }

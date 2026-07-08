@@ -3,7 +3,10 @@ using Xunit;
 
 namespace CbmEngine.Tests.Unit.CbmFr;
 
-// FR-CBM-ROM-001 (CBMFR-006): ROM base resolution helper. Unit-level (temp trees + env var).
+// FR-CBM-ROM-001 (CBMFR-006): ROM base resolution. After de-vendoring vice-sharp, resolution is:
+// the CBMENGINE_ROM_BASE env var if it points at an existing directory, otherwise the per-user download
+// cache (RomCache.DefaultBasePath). It no longer walks to a vice-sharp source checkout and no longer
+// throws when nothing is found (the download-on-demand path populates the cache).
 [Trait("Speed", "Fast")]
 public sealed class RomDiscoveryTests : IDisposable
 {
@@ -17,82 +20,37 @@ public sealed class RomDiscoveryTests : IDisposable
 
     public void Dispose() => Environment.SetEnvironmentVariable(RomDiscovery.RomBaseEnvVar, _savedEnv);
 
-    private static string MakeTree(bool withSlnx)
-    {
-        var root = Path.Combine(Path.GetTempPath(), "cbmrom-" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(Path.Combine(root, "external", "vice-sharp", "native", "vice", "vice", "data"));
-        if (withSlnx) File.WriteAllText(Path.Combine(root, "CbmEngine.slnx"), "<Solution/>");
-        return root;
-    }
-
-    private static string DataDir(string root) =>
-        Path.Combine(root, "external", "vice-sharp", "native", "vice", "vice", "data");
-
     [Fact]
     public void TEST_CBM_013_EnvVar_Wins()
     {
         var envDir = Path.Combine(Path.GetTempPath(), "cbmrom-env-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(envDir);
-        var tree = MakeTree(withSlnx: true);
         try
         {
             Environment.SetEnvironmentVariable(RomDiscovery.RomBaseEnvVar, envDir);
-            var start = Path.Combine(tree, "a", "b");
-            Directory.CreateDirectory(start);
-            Assert.Equal(envDir, RomDiscovery.DiscoverRomBase(start));
+            Assert.Equal(envDir, RomDiscovery.DiscoverRomBase());
         }
-        finally
-        {
-            Directory.Delete(envDir, true);
-            Directory.Delete(tree, true);
-        }
+        finally { Directory.Delete(envDir, true); }
     }
 
     [Fact]
-    public void TEST_CBM_014_FindsViaSlnxWalk()
+    public void TEST_CBM_014_NoEnvVar_FallsBackToPerUserCache()
     {
-        var tree = MakeTree(withSlnx: true);
+        // Env cleared by the ctor. No throw; returns the per-user cache base regardless of start dir.
+        var start = Path.Combine(Path.GetTempPath(), "cbmrom-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(start);
         try
         {
-            var start = Path.Combine(tree, "src", "bin", "Debug");
-            Directory.CreateDirectory(start);
-            Assert.Equal(DataDir(tree), RomDiscovery.DiscoverRomBase(start));
+            Assert.Equal(RomCache.DefaultBasePath, RomDiscovery.DiscoverRomBase(start));
         }
-        finally { Directory.Delete(tree, true); }
+        finally { Directory.Delete(start, true); }
     }
 
     [Fact]
-    public void TEST_CBM_015_FallbackFindsDataDirWithoutSlnx()
+    public void TEST_CBM_016_EnvVarMissingDir_Ignored_FallsBackToCache()
     {
-        var tree = MakeTree(withSlnx: false);
-        try
-        {
-            var start = Path.Combine(tree, "x", "y");
-            Directory.CreateDirectory(start);
-            Assert.Equal(DataDir(tree), RomDiscovery.DiscoverRomBase(start));
-        }
-        finally { Directory.Delete(tree, true); }
-    }
-
-    [Fact]
-    public void TEST_CBM_016_NothingFound_Throws()
-    {
-        var empty = Path.Combine(Path.GetTempPath(), "cbmrom-empty-" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(empty);
-        try
-        {
-            var ex = Assert.Throws<InvalidOperationException>(() => RomDiscovery.DiscoverRomBase(empty));
-            Assert.Contains(RomDiscovery.RomBaseEnvVar, ex.Message);
-        }
-        finally { Directory.Delete(empty, true); }
-    }
-
-    [Fact]
-    public void TEST_CBM_019_SharedResolver_FindsRepoDataDir()
-    {
-        // Program.FindRomBase delegates to this shared resolver; from the test bin it resolves the repo data dir.
-        var baseDir = RomDiscovery.DiscoverRomBase();
-        Assert.True(Directory.Exists(baseDir));
-        Assert.EndsWith(Path.Combine("vice", "vice", "data"), baseDir);
+        var missing = Path.Combine(Path.GetTempPath(), "cbmrom-missing-" + Guid.NewGuid().ToString("N"));
+        Environment.SetEnvironmentVariable(RomDiscovery.RomBaseEnvVar, missing);
+        Assert.Equal(RomCache.DefaultBasePath, RomDiscovery.DiscoverRomBase());
     }
 }

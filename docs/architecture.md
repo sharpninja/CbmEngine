@@ -23,7 +23,7 @@ convenience layer.
 +--------------------------------------------------------------+
 |  CbmEngine.Abstractions       interfaces + value types       |
 +--------------------------------------------------------------+
-|  ViceSharp (submodule)        VIC-II / SID / 6510 emulation  |
+|  ViceSharp (NuGet)            VIC-II / SID / 6510 emulation  |
 +--------------------------------------------------------------+
 ```
 

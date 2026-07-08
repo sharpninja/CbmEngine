@@ -224,5 +224,6 @@ public static class Program
         return null;
     }
 
-    private static string FindRomBase() => CbmEngine.Systems.Strategy.RomDiscovery.DiscoverRomBase();
+    private static string FindRomBase() =>
+        CbmEngine.Systems.Strategy.RomDiscovery.EnsureRomBaseAsync().GetAwaiter().GetResult();
 }

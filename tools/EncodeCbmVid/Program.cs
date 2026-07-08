@@ -116,9 +116,8 @@ return 0;
 
 static string FindRomBase()
 {
-    // Priority: bundled roms/ next to the tool -> CBMVID_ROM_BASE env -> repo walk-up (dev).
-    return StudioRoms.Resolve()
-        ?? throw new InvalidOperationException($"C64 ROMs not found; pass --rom-base <path> or set {StudioRoms.EnvVar}.");
+    // Env var / bundled roms if present, else download the C64 ROMs into the per-user cache on demand.
+    return StudioRoms.ResolveOrDownloadAsync().GetAwaiter().GetResult();
 }
 
 static void PrintUsage()

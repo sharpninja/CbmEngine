@@ -35,11 +35,6 @@
     <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
-  <!-- Bundle the canonical C64 ROMs so the emulator preview works without a repo checkout.
-       StudioRoms.Resolve() finds them at <tool>/roms/C64/. -->
-  <ItemGroup>
-    <None Include="..\..\external\vice-sharp\native\vice\vice\data\C64\basic-901226-01.bin" Link="roms\C64\basic-901226-01.bin" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="..\..\external\vice-sharp\native\vice\vice\data\C64\kernal-901227-03.bin" Link="roms\C64\kernal-901227-03.bin" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="..\..\external\vice-sharp\native\vice\vice\data\C64\chargen-901225-01.bin" Link="roms\C64\chargen-901225-01.bin" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
+  <!-- C64 ROMs are acquired on demand at runtime (ViceSharp RomProvider downloads from the VICE mirror
+       into the per-user cache); no longer bundled from the vice-sharp submodule. -->
 </Project>

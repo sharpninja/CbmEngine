@@ -58,9 +58,9 @@ cbmvid --in pngs/ --out frames.cbmvid
 # Validate a .cbmvid header:
 cbmvid --validate --out movie.cbmvid
 
-# Render an existing .cbmvid through a real emulator into a preview GIF:
-cbmvid --in-cbmvid movie.cbmvid --gif-out preview.gif \
-       --rom-base external/vice-sharp/native/vice/vice/data
+# Render an existing .cbmvid through a real emulator into a preview GIF
+# (the C64 ROMs download + cache automatically on first run):
+cbmvid --in-cbmvid movie.cbmvid --gif-out preview.gif
 
 # Encode and produce an emulator-rendered preview in one shot:
 cbmvid --in-video movie.mp4 --out movie.cbmvid --gif-out preview.gif

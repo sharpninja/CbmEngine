@@ -16,8 +16,7 @@ public class HostAudioTests
     [Fact]
     public void TEST_CBM_HOST_002_SidPokeProducesAudibleSamples()
     {
-        var romBase = Path.Combine(BootSpikeTests.RepoRootPublic, "external", "vice-sharp", "native", "vice", "vice", "data");
-        var roms = new RomProvider(romBase);
+        var roms = Helpers.TestRomProvider.Create();
         var result = BootRunner.Run(C64MachineProfiles.C64Pal, roms, framesToWarm: 120);
         var machine = result.Machine;
         var sid = machine.Devices.GetByRole(DeviceRole.AudioChip) as IAudioChip;

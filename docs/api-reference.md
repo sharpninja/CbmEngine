@@ -133,6 +133,25 @@ public static class CommodoreSystem
 The top-level entry point. `CommodoreMachine` is the `ICommodoreMachine`
 implementation it returns.
 
+### RomDiscovery / RomCache (ROM acquisition)
+```csharp
+public static class RomDiscovery
+{
+    public const string RomBaseEnvVar = "CBMENGINE_ROM_BASE";
+    public static string DiscoverRomBase(string? startDir = null);
+    public static IRomProvider Discover(string? startDir = null);            // resolve only, no download
+    public static Task<string> EnsureRomBaseAsync(string? startDir = null, CancellationToken ct = default);
+    public static Task<IRomProvider> DiscoverOrDownloadAsync(string? startDir = null, CancellationToken ct = default);
+}
+
+public static class RomCache { public static string DefaultBasePath { get; } } // %LOCALAPPDATA%/CbmEngine/roms
+```
+The C64 ROMs (`basic`/`kernal`/`characters`) are resolved from
+`CBMENGINE_ROM_BASE` if it points at an existing directory, otherwise the
+per-user cache, and downloaded on demand (SHA256-verified) by
+`DiscoverOrDownloadAsync` / `EnsureRomBaseAsync`. `CommodoreSystem.Build` and
+`BootRunner.Run` take the resulting `IRomProvider`.
+
 ### GameContext
 ```csharp
 public sealed class GameContext : IGameContext
