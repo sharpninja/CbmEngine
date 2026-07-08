@@ -69,22 +69,22 @@ RomDiscoveryTests: CBMENGINE_ROM_BASE env var wins.
 
 ### TEST-CBM-014
 
-RomDiscoveryTests: finds data dir via CbmEngine.slnx walk.
+RomDiscoveryTests (TEST_CBM_014): with no CBMENGINE_ROM_BASE, DiscoverRomBase returns the per-user cache base.
 
 
 ### TEST-CBM-015
 
-RomDiscoveryTests: fallback finds external vice data dir without slnx.
+RomAcquisitionTests (TEST_ROM_001/002): EnsureC64RomsAsync downloads each missing C64 ROM via the acquirer and skips present ones.
 
 
 ### TEST-CBM-016
 
-RomDiscoveryTests: nothing found throws InvalidOperationException with actionable message.
+RomDiscoveryTests (TEST_CBM_016): CBMENGINE_ROM_BASE pointing at a missing directory falls back to the cache base (no throw).
 
 
 ### TEST-CBM-017
 
-RomDiscoveryIntegrationTests: Discover() IRomProvider IsAvailable true for C64 ROMs.
+RomAcquisitionIntegrationTests (TEST_ROM_INT_001): download-on-demand caches the three C64 ROMs (IsAvailable true) then the emulator boots.
 
 
 ### TEST-CBM-018
@@ -94,7 +94,7 @@ RomDiscoveryIntegrationTests: Build(c64) builds machine equivalent to Build(c64,
 
 ### TEST-CBM-019
 
-RomDiscoveryTests: Program.FindRomBase delegates to RomDiscovery.
+RomDiscoveryTests: EncodeCbmVid/Game.Sample/CbmVidStudio entry points resolve ROMs via RomDiscovery/StudioRoms download-on-demand.
 
 
 ### TEST-CBM-020
@@ -348,6 +348,11 @@ Given a machine exposing an IAudioChip and a RecordingAudioBackend injected via 
 Reflection over MonoGameHost shows a private field of type CbmViewport and no fields of type EmulatorPump, MonoGameBlitTarget, SidPump, or MonoGameAudioBackend, proving emulator composition is not duplicated.
 
 
+### TEST-CBM-HOST-020
+
+Unit tests for internal FrameLease. using var releases on exception. Non-hybrid unaffected. Uses fakes. Internal visibility.
+
+
 
 ## TEST-CBM-MIDI
 
@@ -404,3 +409,11 @@ BenchmarkDotNet MemoryDiagnoser - Gen0/Gen1/Gen2 == 0 after warm-up.
 ### TEST-CBM-MIDI-011
 
 After 1s emulated playback, RecordingAudioBackend.Samples.Count(s => Math.Abs(s) > 0.001) >= 1000.
+
+
+
+## TEST-CBM-SAMPLE
+
+### TEST-CBM-SAMPLE-001
+
+Tests for extracted helpers, ILogger calls instead of Console, engine harness used in SampleGameTests and others.

@@ -16,6 +16,7 @@ Traceability policy: see `Requirements-Traceability-Policy.md`.
 | FR-CBM-HOST-004 | Tracked | Functional-Requirements.md |
 | FR-CBM-HOST-005 | Tracked | Functional-Requirements.md |
 | FR-CBM-HOST-006 | Tracked | Functional-Requirements.md |
+| FR-CBM-HOST-007 | Tracked | Functional-Requirements.md |
 | FR-CBM-LAYOUT-001 | Tracked | Functional-Requirements.md |
 | FR-CBM-MIDI-001 | Tracked | Functional-Requirements.md |
 | FR-CBM-MIDI-002 | Tracked | Functional-Requirements.md |
@@ -29,6 +30,7 @@ Traceability policy: see `Requirements-Traceability-Policy.md`.
 | FR-CBM-MIDI-010 | Tracked | Functional-Requirements.md |
 | FR-CBM-PUMP-001 | Tracked | Functional-Requirements.md |
 | FR-CBM-ROM-001 | Tracked | Functional-Requirements.md |
+| FR-CBM-SAMPLE-001 | Tracked | Functional-Requirements.md |
 | FR-CBM-TEXT-001 | Tracked | Functional-Requirements.md |
 | FR-CBM-VIC-001 | Tracked | Functional-Requirements.md |
 | TR-CBM-BITMAPMODE-001 | Tracked | Technical-Requirements.md |
@@ -43,6 +45,7 @@ Traceability policy: see `Requirements-Traceability-Policy.md`.
 | TR-CBM-HOST-004 | Tracked | Technical-Requirements.md |
 | TR-CBM-HOST-005 | Tracked | Technical-Requirements.md |
 | TR-CBM-HOST-006 | Tracked | Technical-Requirements.md |
+| TR-CBM-HOST-FRAME-001 | Tracked | Technical-Requirements.md |
 | TR-CBM-LAYOUT-001 | Tracked | Technical-Requirements.md |
 | TR-CBM-MIDI-101 | Tracked | Technical-Requirements.md |
 | TR-CBM-MIDI-102 | Tracked | Technical-Requirements.md |
@@ -52,6 +55,8 @@ Traceability policy: see `Requirements-Traceability-Policy.md`.
 | TR-CBM-MIDI-106 | Tracked | Technical-Requirements.md |
 | TR-CBM-PUMP-001 | Tracked | Technical-Requirements.md |
 | TR-CBM-ROM-001 | Tracked | Technical-Requirements.md |
+| TR-CBM-SAMPLE-LOG-001 | Tracked | Technical-Requirements.md |
+| TR-CBM-SAMPLE-ORG-001 | Tracked | Technical-Requirements.md |
 | TR-CBM-TEXT-001 | Tracked | Technical-Requirements.md |
 | TR-CBM-VIC-001 | Tracked | Technical-Requirements.md |
 | TEST-CBM-001 | Tracked | Testing-Requirements.md |
@@ -122,6 +127,7 @@ Traceability policy: see `Requirements-Traceability-Policy.md`.
 | TEST-CBM-HOST-007 | Tracked | Testing-Requirements.md |
 | TEST-CBM-HOST-008 | Tracked | Testing-Requirements.md |
 | TEST-CBM-HOST-009 | Tracked | Testing-Requirements.md |
+| TEST-CBM-HOST-020 | Tracked | Testing-Requirements.md |
 | TEST-CBM-MIDI-001 | Tracked | Testing-Requirements.md |
 | TEST-CBM-MIDI-002 | Tracked | Testing-Requirements.md |
 | TEST-CBM-MIDI-003 | Tracked | Testing-Requirements.md |
@@ -133,3 +139,4 @@ Traceability policy: see `Requirements-Traceability-Policy.md`.
 | TEST-CBM-MIDI-009 | Tracked | Testing-Requirements.md |
 | TEST-CBM-MIDI-010 | Tracked | Testing-Requirements.md |
 | TEST-CBM-MIDI-011 | Tracked | Testing-Requirements.md |
+| TEST-CBM-SAMPLE-001 | Tracked | Testing-Requirements.md |

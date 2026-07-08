@@ -1,13 +1,23 @@
 {
   "schema": "mcp-requirements-wiki/v1",
   "platform": "github",
-  "generatedAtUtc": "2026-06-16T11:40:16.3397144+00:00",
+  "generatedAtUtc": "2026-07-08T16:36:22.2999464+00:00",
   "documents": [
     "Home.md",
     "Functional-Requirements.md",
     "Technical-Requirements.md",
     "Testing-Requirements.md",
     "TR-per-FR-Mapping.md",
-    "Requirements-Matrix.md"
+    "Requirements-Matrix.md",
+    "Getting-Started.md",
+    "Architecture.md",
+    "Memory-and-IO.md",
+    "Graphics-Sprites-Tilemap.md",
+    "Audio-and-SID.md",
+    "MIDI-to-SID.md",
+    "CbmVid-Format.md",
+    "Cartridges-and-CRT.md",
+    "Tools.md",
+    "API-Reference.md"
   ]
 }
