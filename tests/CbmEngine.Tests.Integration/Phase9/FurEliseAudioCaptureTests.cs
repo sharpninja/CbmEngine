@@ -8,7 +8,6 @@ using ViceSharp.Abstractions;
 using ViceSharp.Core.Media;
 using SharedRecordingBackend = CbmEngine.Tests.Shared.Helpers.RecordingAudioBackend;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace CbmEngine.Tests.Integration.Phase9;
 

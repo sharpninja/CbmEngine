@@ -3,7 +3,7 @@ using CbmEngine.Abstractions;
 using CbmEngine.Host.MonoGame;
 using CbmEngine.Tests.Shared.Helpers;
 using Microsoft.Xna.Framework.Graphics;
-using Moq;
+using NSubstitute;
 using ViceSharp.Abstractions;
 using Xunit;
 
@@ -36,7 +36,7 @@ public class CbmViewportTests
         var input = new FakeInputScript()
             .Press(0, 0x0A)
             .Release(2, 0x0A);
-        using var viewport = NewNonHybrid(machine.Object, blit, input);
+        using var viewport = NewNonHybrid(machine, blit, input);
 
         for (int i = 0; i < 5; i++)
         {
@@ -44,13 +44,13 @@ public class CbmViewportTests
             viewport.RefreshTexture();
         }
 
-        machine.Verify(m => m.RunFrame(), Times.Exactly(5));
+        machine.Received(5).RunFrame();
         Assert.Equal(5, blit.UploadCount);
         Assert.Equal(5, input.DrainCallCount);
         Assert.Equal(FakeMachineBuilder.FbWidth, blit.LastWidth);
         Assert.Equal(FakeMachineBuilder.FbHeight, blit.LastHeight);
-        keyboard.Verify(k => k.SetKey(0x0A, true), Times.Once);
-        keyboard.Verify(k => k.SetKey(0x0A, false), Times.Once);
+        keyboard.Received(1).SetKey(0x0A, true);
+        keyboard.Received(1).SetKey(0x0A, false);
     }
 
     // TEST-CBM-HOST-006
@@ -60,7 +60,7 @@ public class CbmViewportTests
         var (machine, _, _, _) = FakeMachineBuilder.Build();
         var blit = new FakeBlitTarget();
         using var viewport = new CbmViewport(
-            machine.Object, blit, ownsBlit: false, new FakeInputScript(), audioBackend: null,
+            machine, blit, ownsBlit: false, new FakeInputScript(), audioBackend: null,
             refreshHz: 200.0, sampleRate: 44100, game: null, gameContext: null, useHybridPump: true);
 
         var sw = Stopwatch.StartNew();
@@ -90,20 +90,20 @@ public class CbmViewportTests
     {
         var (machine, _, _, _) = FakeMachineBuilder.Build();
         Assert.Throws<ArgumentNullException>(() =>
-            new CbmViewport(machine.Object, (GraphicsDevice)null!));
+            new CbmViewport(machine, (GraphicsDevice)null!));
     }
 
     // TEST-CBM-HOST-007
     [Fact]
     public void TEST_CBM_HOST_007_MachineWithoutVideoChip_Throws()
     {
-        var registry = new Mock<IDeviceRegistry>();
-        registry.Setup(r => r.GetByRole(DeviceRole.VideoChip)).Returns((IDevice?)null);
-        var machine = new Mock<IMachine>();
-        machine.SetupGet(m => m.Devices).Returns(registry.Object);
+        var registry = Substitute.For<IDeviceRegistry>();
+        registry.GetByRole(DeviceRole.VideoChip).Returns((IDevice?)null);
+        var machine = Substitute.For<IMachine>();
+        machine.Devices.Returns(registry);
 
         Assert.Throws<InvalidOperationException>(() =>
-            NewNonHybrid(machine.Object, new FakeBlitTarget(), new FakeInputScript()));
+            NewNonHybrid(machine, new FakeBlitTarget(), new FakeInputScript()));
     }
 
     // TEST-CBM-HOST-007
@@ -111,7 +111,7 @@ public class CbmViewportTests
     public void TEST_CBM_HOST_007_FrameDimensions_MatchVideoChip()
     {
         var (machine, _, _, _) = FakeMachineBuilder.Build();
-        using var viewport = NewNonHybrid(machine.Object, new FakeBlitTarget(), new FakeInputScript());
+        using var viewport = NewNonHybrid(machine, new FakeBlitTarget(), new FakeInputScript());
 
         Assert.Equal(FakeMachineBuilder.FbWidth, viewport.FrameWidth);
         Assert.Equal(FakeMachineBuilder.FbHeight, viewport.FrameHeight);
@@ -121,9 +121,9 @@ public class CbmViewportTests
     [Fact]
     public void TEST_CBM_HOST_008_AudioPump_SubmitsSamplesEachTick()
     {
-        var (machine, registry, _, audioChip) = BuildMachineWithAudio();
+        var (machine, _, _, audioChip) = BuildMachineWithAudio();
         var backend = new RecordingAudioBackend();
-        using var viewport = NewNonHybrid(machine.Object, new FakeBlitTarget(), new FakeInputScript(),
+        using var viewport = NewNonHybrid(machine, new FakeBlitTarget(), new FakeInputScript(),
             audio: backend, refreshHz: 50.0, sampleRate: 441);
 
         for (int i = 0; i < 3; i++)
@@ -131,7 +131,7 @@ public class CbmViewportTests
 
         Assert.Equal(3, backend.SubmitCallCount);
         Assert.True(backend.Samples.Count > 0);
-        audioChip.Verify(a => a.GenerateSample(), Times.AtLeastOnce);
+        audioChip.Received().GenerateSample();
     }
 
     // TEST-CBM-HOST-008
@@ -139,11 +139,11 @@ public class CbmViewportTests
     public void TEST_CBM_HOST_008_EnqueueKey_ForwardsToKeyboardMatrix()
     {
         var (machine, _, keyboard, _) = FakeMachineBuilder.Build();
-        using var viewport = NewNonHybrid(machine.Object, new FakeBlitTarget(), new FakeInputScript());
+        using var viewport = NewNonHybrid(machine, new FakeBlitTarget(), new FakeInputScript());
 
         viewport.EnqueueKey(0x0A, true);
 
-        keyboard.Verify(k => k.SetKey(0x0A, true), Times.Once);
+        keyboard.Received(1).SetKey(0x0A, true);
     }
 
     [Fact]
@@ -154,27 +154,27 @@ public class CbmViewportTests
         Assert.True(typeof(IDisposable).IsAssignableFrom(typeof(CbmViewport)));
     }
 
-    private static (Mock<IMachine> Machine, Mock<IDeviceRegistry> Registry, Mock<IKeyboardMatrix> Keyboard, Mock<IAudioChip> Audio)
+    private static (IMachine Machine, IDeviceRegistry Registry, IKeyboardMatrix Keyboard, IAudioChip Audio)
         BuildMachineWithAudio()
     {
         var fb = new byte[FakeMachineBuilder.FbWidth * FakeMachineBuilder.FbHeight * 4];
-        var video = new Mock<IVideoChip>();
-        video.SetupGet(v => v.FrameBuffer).Returns(fb);
-        video.SetupGet(v => v.FrameWidth).Returns(FakeMachineBuilder.FbWidth);
-        video.SetupGet(v => v.FrameHeight).Returns(FakeMachineBuilder.FbHeight);
+        var video = Substitute.For<IVideoChip>();
+        video.FrameBuffer.Returns(fb);
+        video.FrameWidth.Returns(FakeMachineBuilder.FbWidth);
+        video.FrameHeight.Returns(FakeMachineBuilder.FbHeight);
 
-        var keyboard = new Mock<IKeyboardMatrix>();
-        var audio = new Mock<IAudioChip>();
-        audio.Setup(a => a.GenerateSample()).Returns(0.5f);
+        var keyboard = Substitute.For<IKeyboardMatrix>();
+        var audio = Substitute.For<IAudioChip>();
+        audio.GenerateSample().Returns(0.5f);
 
-        var registry = new Mock<IDeviceRegistry>();
-        registry.Setup(r => r.GetByRole(DeviceRole.VideoChip)).Returns(video.Object);
-        registry.Setup(r => r.GetByRole(DeviceRole.AudioChip)).Returns(audio.Object);
-        registry.Setup(r => r.GetAll<IKeyboardMatrix>())
-            .Returns((IReadOnlyList<IKeyboardMatrix>)new[] { keyboard.Object });
+        var registry = Substitute.For<IDeviceRegistry>();
+        registry.GetByRole(DeviceRole.VideoChip).Returns(video);
+        registry.GetByRole(DeviceRole.AudioChip).Returns(audio);
+        registry.GetAll<IKeyboardMatrix>()
+            .Returns((IReadOnlyList<IKeyboardMatrix>)new[] { keyboard });
 
-        var machine = new Mock<IMachine>();
-        machine.SetupGet(m => m.Devices).Returns(registry.Object);
+        var machine = Substitute.For<IMachine>();
+        machine.Devices.Returns(registry);
 
         return (machine, registry, keyboard, audio);
     }
@@ -188,7 +188,7 @@ public class CbmViewportTests
         var (machine, _, _, _) = FakeMachineBuilder.Build();
         var blit = new FakeBlitTarget();
         using var viewport = new CbmViewport(
-            machine.Object, blit, ownsBlit: false, new FakeInputScript(), audioBackend: null,
+            machine, blit, ownsBlit: false, new FakeInputScript(), audioBackend: null,
             refreshHz: 200.0, sampleRate: 44100, game: null, gameContext: null, useHybridPump: true);
 
         // Wait for pump to produce at least one frame

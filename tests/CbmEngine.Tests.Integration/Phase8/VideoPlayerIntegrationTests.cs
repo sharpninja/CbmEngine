@@ -6,7 +6,6 @@ using CbmEngine.Systems.Strategy;
 using CbmEngine.Systems.Video;
 using CbmEngine.Tests.Integration.Helpers;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace CbmEngine.Tests.Integration.Phase8;
 

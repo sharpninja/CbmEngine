@@ -1,6 +1,6 @@
 using CbmEngine.Host.MonoGame;
 using CbmEngine.Tests.Shared.Helpers;
-using Moq;
+using NSubstitute;
 using ViceSharp.Abstractions;
 using Xunit;
 
@@ -12,12 +12,12 @@ public class SidPumpTests
     [Fact]
     public void PumpFrame_SubmitsExpectedSampleCount()
     {
-        var sid = new Mock<IAudioChip>();
+        var sid = Substitute.For<IAudioChip>();
         float i = 0;
-        sid.Setup(s => s.GenerateSample()).Returns(() => i++ * 0.001f);
+        sid.GenerateSample().Returns(_ => i++ * 0.001f);
         var backend = new RecordingAudioBackend();
 
-        var pump = new SidPump(sid.Object, backend, sampleRate: 44100, refreshHz: 50.0);
+        var pump = new SidPump(sid, backend, sampleRate: 44100, refreshHz: 50.0);
         pump.PumpFrame();
 
         Assert.Equal(882, pump.SamplesPerFrame);
@@ -28,7 +28,7 @@ public class SidPumpTests
     [Fact]
     public void Pump_RejectsBadConstructorArgs()
     {
-        var sid = new Mock<IAudioChip>().Object;
+        var sid = Substitute.For<IAudioChip>();
         var backend = new RecordingAudioBackend();
 
         Assert.Throws<ArgumentNullException>(() => new SidPump(null!, backend, 44100, 50.0));

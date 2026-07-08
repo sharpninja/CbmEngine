@@ -1,5 +1,5 @@
 using CbmEngine.Systems.Boot;
-using Moq;
+using NSubstitute;
 using ViceSharp.Abstractions;
 using ViceSharp.Architectures.C64;
 using Xunit;
@@ -12,11 +12,11 @@ public class BootRunnerUnitTests
     [Fact]
     public void MissingRoms_ThrowsWithMachineNameInMessage()
     {
-        var roms = new Mock<IRomProvider>(MockBehavior.Strict);
-        roms.Setup(r => r.IsAvailable(It.IsAny<string>(), It.IsAny<string>())).Returns(false);
+        var roms = Substitute.For<IRomProvider>();
+        roms.IsAvailable(Arg.Any<string>(), Arg.Any<string>()).Returns(false);
 
         var ex = Assert.Throws<InvalidOperationException>(() =>
-            BootRunner.Run(C64MachineProfiles.C64Pal, roms.Object, framesToWarm: 0));
+            BootRunner.Run(C64MachineProfiles.C64Pal, roms, framesToWarm: 0));
 
         Assert.Contains("Commodore 64 PAL", ex.Message);
         Assert.Contains("ROM", ex.Message, StringComparison.OrdinalIgnoreCase);
@@ -25,7 +25,7 @@ public class BootRunnerUnitTests
     [Fact]
     public void Run_NullProfile_Throws()
     {
-        var roms = new Mock<IRomProvider>().Object;
+        var roms = Substitute.For<IRomProvider>();
         Assert.Throws<ArgumentNullException>(() => BootRunner.Run(null!, roms, 0));
     }
 

@@ -1,12 +1,13 @@
 using System.Net.Http;
 using CbmEngine.Systems.Strategy;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Xunit;
 
 namespace CbmEngine.Tests.Unit;
 
 /// <summary>
-/// Byrd TDD tests for download-on-demand ROM acquisition. The orchestration is tested against a mocked
+/// Byrd TDD tests for download-on-demand ROM acquisition. The orchestration is tested against a substituted
 /// <see cref="IRomAcquirer"/> (no network): it downloads every missing C64 ROM, skips present ones, and
 /// surfaces download failures. Also pins the per-user cache base.
 /// </summary>
@@ -16,42 +17,41 @@ public class RomAcquisitionTests
     [Fact]
     public async Task TEST_ROM_001_EnsureC64Roms_DownloadsEachMissingRom()
     {
-        var acquirer = new Mock<IRomAcquirer>(MockBehavior.Strict);
-        acquirer.Setup(a => a.IsAvailable(It.IsAny<string>(), "C64")).Returns(false);
-        acquirer.Setup(a => a.DownloadAsync(It.IsAny<string>(), "C64", It.IsAny<CancellationToken>()))
+        var acquirer = Substitute.For<IRomAcquirer>();
+        acquirer.IsAvailable(Arg.Any<string>(), "C64").Returns(false);
+        acquirer.DownloadAsync(Arg.Any<string>(), "C64", Arg.Any<CancellationToken>())
                 .Returns(Task.CompletedTask);
 
-        await RomAcquisition.EnsureC64RomsAsync(acquirer.Object);
+        await RomAcquisition.EnsureC64RomsAsync(acquirer);
 
         foreach (var name in new[] { "basic", "kernal", "characters" })
         {
-            acquirer.Verify(a => a.DownloadAsync(name, "C64", It.IsAny<CancellationToken>()), Times.Once);
+            await acquirer.Received(1).DownloadAsync(name, "C64", Arg.Any<CancellationToken>());
         }
     }
 
     [Fact]
     public async Task TEST_ROM_002_EnsureC64Roms_SkipsDownloadWhenPresent()
     {
-        var acquirer = new Mock<IRomAcquirer>(MockBehavior.Strict);
-        acquirer.Setup(a => a.IsAvailable(It.IsAny<string>(), "C64")).Returns(true);
+        var acquirer = Substitute.For<IRomAcquirer>();
+        acquirer.IsAvailable(Arg.Any<string>(), "C64").Returns(true);
 
-        await RomAcquisition.EnsureC64RomsAsync(acquirer.Object);
+        await RomAcquisition.EnsureC64RomsAsync(acquirer);
 
-        acquirer.Verify(
-            a => a.DownloadAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
-            Times.Never);
+        await acquirer.DidNotReceive()
+                      .DownloadAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task TEST_ROM_003_EnsureC64Roms_PropagatesDownloadFailure()
     {
-        var acquirer = new Mock<IRomAcquirer>(MockBehavior.Strict);
-        acquirer.Setup(a => a.IsAvailable(It.IsAny<string>(), "C64")).Returns(false);
-        acquirer.Setup(a => a.DownloadAsync(It.IsAny<string>(), "C64", It.IsAny<CancellationToken>()))
+        var acquirer = Substitute.For<IRomAcquirer>();
+        acquirer.IsAvailable(Arg.Any<string>(), "C64").Returns(false);
+        acquirer.DownloadAsync(Arg.Any<string>(), "C64", Arg.Any<CancellationToken>())
                 .ThrowsAsync(new HttpRequestException("download failed"));
 
         await Assert.ThrowsAsync<HttpRequestException>(
-            () => RomAcquisition.EnsureC64RomsAsync(acquirer.Object));
+            () => RomAcquisition.EnsureC64RomsAsync(acquirer));
     }
 
     [Fact]

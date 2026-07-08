@@ -6,7 +6,6 @@ using CbmEngine.Tests.Integration.Helpers;
 using ViceSharp.Abstractions;
 using ViceSharp.Core;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace CbmEngine.Tests.Integration;
 

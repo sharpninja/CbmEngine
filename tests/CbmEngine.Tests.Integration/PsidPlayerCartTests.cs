@@ -4,7 +4,6 @@ using CbmEngine.Systems.Strategy;
 using CbmEngine.Tests.Integration.Helpers;
 using CbmEngine.Tests.Shared.Helpers;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace CbmEngine.Tests.Integration;
 

@@ -14,7 +14,7 @@ public class HostLoopTests
         var blit = new FakeBlitTarget();
         var input = new FakeInputScript();
         var clock = new FakeClock();
-        var host = new HeadlessHost(machine.Object, blit, input, clock, refreshHz: 50.125);
+        var host = new HeadlessHost(machine, blit, input, clock, refreshHz: 50.125);
 
         host.Run(TimeSpan.FromSeconds(5));
 
@@ -26,7 +26,7 @@ public class HostLoopTests
     public void HeadlessHost_RunFrames_AdvancesFrameCountExactly()
     {
         var (machine, _, _, _) = FakeMachineBuilder.Build();
-        var host = new HeadlessHost(machine.Object, new FakeBlitTarget(), new FakeInputScript(), new FakeClock(), 50.0);
+        var host = new HeadlessHost(machine, new FakeBlitTarget(), new FakeInputScript(), new FakeClock(), 50.0);
 
         host.RunFrames(17);
 
