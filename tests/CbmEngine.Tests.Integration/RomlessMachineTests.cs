@@ -75,6 +75,43 @@ public class RomlessMachineTests
     }
 
     [Fact]
+    public void BuildRomless_MulticolorBitmap_RendersScreenAndColorRamContent_NotJustBackground()
+    {
+        var sys = CommodoreSystem.BuildRomless("c64");
+
+        // Full-screen multicolour bitmap. Bitmap 0b00011011 = pixel-pairs 00,01,10,11 in every cell ->
+        // background / screen-hi-nibble / screen-lo-nibble / colour-RAM. With distinct sources
+        // (bg 0, screen $23 -> hi 2, lo 3, colour 4) the visible frame must contain those four colours,
+        // not background-only. All-black means the VIC fetched screen/bitmap from the wrong bank
+        // (BuildRomless.InitVicBank0 is what places them in bank 0). The whole active area is filled and
+        // the whole framebuffer is sampled, so the assertion never depends on one hand-picked pixel.
+        sys.Memory.WriteIo(Vic.D011, new[] { D011FullBitmap });
+        sys.Memory.WriteIo(Vic.D016, new[] { D016Mcm });
+        sys.Memory.WriteIo(Vic.D018, new[] { D018Bitmap });
+        sys.Memory.WriteIo(Vic.D020, new byte[] { 0 });
+        sys.Memory.WriteIo(Vic.D021, new byte[] { 0 }); // background = black
+        var bitmap = new byte[8000]; Array.Fill(bitmap, (byte)0b00011011);
+        var screen = new byte[1000]; Array.Fill(screen, (byte)0x23);
+        var color = new byte[1000]; Array.Fill(color, (byte)0x04);
+        sys.Memory.WriteRange(BitmapBase, bitmap);
+        sys.Memory.WriteRange(ScreenBase, screen);
+        sys.Memory.WriteIo(ColorRamBase, color);
+
+        for (int i = 0; i < 6; i++) sys.RunFrame();
+
+        var fb = sys.VideoChip.FrameBuffer;
+        var distinct = new HashSet<uint>();
+        for (int p = 0; p < fb.Length; p += 4)
+            distinct.Add((uint)(fb[p] | fb[p + 1] << 8 | fb[p + 2] << 16 | fb[p + 3] << 24));
+
+        var vic = (ViceSharp.Chips.VicIi.Mos6569)sys.VideoChip;
+        Assert.True(
+            distinct.Count >= 3,
+            $"ROM-less multicolour content did not render: {distinct.Count} distinct colour(s), expected >= 3. " +
+            $"displayEnabled={vic.IsDisplayEnabled} yscroll={vic.YScroll} D011={sys.Bus.Read(0xD011):X2}.");
+    }
+
+    [Fact]
     public void BuildRomless_Psid_ViaStandaloneIrq_StreamsOscillatingSid()
     {
         var audio = new RecordingAudioBackend();
