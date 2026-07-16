@@ -118,7 +118,8 @@
         },
         "NuGetApiKey": {
           "type": "string",
-          "description": "NuGet API key for PublishNuGet. Defaults to the NUGET_API_KEY environment variable"
+          "description": "NuGet API key for PublishNuGet. Defaults to the NUGET_API_KEY environment variable",
+          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
         "NuGetSkipDuplicate": {
           "type": "boolean",

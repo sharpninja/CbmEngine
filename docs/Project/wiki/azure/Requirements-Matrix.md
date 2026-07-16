@@ -9,6 +9,9 @@ Traceability policy: see `Requirements-Traceability-Policy.md`.
 | FR-CBM-BOOT-002 | Tracked | Functional-Requirements.md |
 | FR-CBM-BOOT-003 | Tracked | Functional-Requirements.md |
 | FR-CBM-CANVAS-001 | Tracked | Functional-Requirements.md |
+| FR-CBM-DEPS-001 | Tracked | Functional-Requirements.md |
+| FR-CBM-DEPS-002 | Tracked | Functional-Requirements.md |
+| FR-CBM-DEPS-003 | Tracked | Functional-Requirements.md |
 | FR-CBM-ENCODE-001 | Tracked | Functional-Requirements.md |
 | FR-CBM-HOST-001 | Tracked | Functional-Requirements.md |
 | FR-CBM-HOST-002 | Tracked | Functional-Requirements.md |
@@ -28,6 +31,7 @@ Traceability policy: see `Requirements-Traceability-Policy.md`.
 | FR-CBM-MIDI-008 | Tracked | Functional-Requirements.md |
 | FR-CBM-MIDI-009 | Tracked | Functional-Requirements.md |
 | FR-CBM-MIDI-010 | Tracked | Functional-Requirements.md |
+| FR-CBM-PUBLISH-001 | Tracked | Functional-Requirements.md |
 | FR-CBM-PUMP-001 | Tracked | Functional-Requirements.md |
 | FR-CBM-ROM-001 | Tracked | Functional-Requirements.md |
 | FR-CBM-SAMPLE-001 | Tracked | Functional-Requirements.md |
@@ -38,6 +42,7 @@ Traceability policy: see `Requirements-Traceability-Policy.md`.
 | TR-CBM-BOOT-002 | Tracked | Technical-Requirements.md |
 | TR-CBM-BOOT-003 | Tracked | Technical-Requirements.md |
 | TR-CBM-CANVAS-001 | Tracked | Technical-Requirements.md |
+| TR-CBM-DEPS-001 | Tracked | Technical-Requirements.md |
 | TR-CBM-ENCODE-001 | Tracked | Technical-Requirements.md |
 | TR-CBM-HOST-001 | Tracked | Technical-Requirements.md |
 | TR-CBM-HOST-002 | Tracked | Technical-Requirements.md |
@@ -53,6 +58,7 @@ Traceability policy: see `Requirements-Traceability-Policy.md`.
 | TR-CBM-MIDI-104 | Tracked | Technical-Requirements.md |
 | TR-CBM-MIDI-105 | Tracked | Technical-Requirements.md |
 | TR-CBM-MIDI-106 | Tracked | Technical-Requirements.md |
+| TR-CBM-PUBLISH-001 | Tracked | Technical-Requirements.md |
 | TR-CBM-PUMP-001 | Tracked | Technical-Requirements.md |
 | TR-CBM-ROM-001 | Tracked | Technical-Requirements.md |
 | TR-CBM-SAMPLE-LOG-001 | Tracked | Technical-Requirements.md |
@@ -118,6 +124,7 @@ Traceability policy: see `Requirements-Traceability-Policy.md`.
 | TEST-CBM-BOOT-001 | Tracked | Testing-Requirements.md |
 | TEST-CBM-BOOT-002 | Tracked | Testing-Requirements.md |
 | TEST-CBM-BOOT-003 | Tracked | Testing-Requirements.md |
+| TEST-CBM-DEPS-001 | Tracked | Testing-Requirements.md |
 | TEST-CBM-HOST-001 | Tracked | Testing-Requirements.md |
 | TEST-CBM-HOST-002 | Tracked | Testing-Requirements.md |
 | TEST-CBM-HOST-003 | Tracked | Testing-Requirements.md |
@@ -139,4 +146,5 @@ Traceability policy: see `Requirements-Traceability-Policy.md`.
 | TEST-CBM-MIDI-009 | Tracked | Testing-Requirements.md |
 | TEST-CBM-MIDI-010 | Tracked | Testing-Requirements.md |
 | TEST-CBM-MIDI-011 | Tracked | Testing-Requirements.md |
+| TEST-CBM-PUBLISH-001 | Tracked | Testing-Requirements.md |
 | TEST-CBM-SAMPLE-001 | Tracked | Testing-Requirements.md |

@@ -25,6 +25,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\..\_build\CommandLogFormatter.cs" Link="Build\CommandLogFormatter.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 

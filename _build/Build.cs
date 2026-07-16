@@ -18,6 +18,7 @@ class Build : NukeBuild
     readonly string NuGetSource = "https://api.nuget.org/v3/index.json";
 
     [Parameter("NuGet API key for PublishNuGet. Defaults to the NUGET_API_KEY environment variable.")]
+    [Secret]
     readonly string? NuGetApiKey = null;
 
     [Parameter("Commit all current changes and create an annotated release tag before PublishNuGet packs from the last tag.")]
@@ -329,7 +330,7 @@ class Build : NukeBuild
 
     static void RunProcessIn(string workingDirectory, string fileName, params string[] arguments)
     {
-        Log.Information("> {Command}", FormatCommand(fileName, arguments));
+        Log.Information("> {Command}", CommandLogFormatter.Format(fileName, arguments));
 
         using var process = CreateProcess(workingDirectory, fileName, arguments);
         process.OutputDataReceived += (_, args) =>
@@ -351,12 +352,12 @@ class Build : NukeBuild
         process.WaitForExit();
 
         if (process.ExitCode != 0)
-            throw new InvalidOperationException($"Command failed with exit code {process.ExitCode}: {FormatCommand(fileName, arguments)}");
+            throw new InvalidOperationException($"Command failed with exit code {process.ExitCode}: {CommandLogFormatter.Format(fileName, arguments)}");
     }
 
     static string CaptureProcessIn(string workingDirectory, string fileName, params string[] arguments)
     {
-        Log.Information("> {Command}", FormatCommand(fileName, arguments));
+        Log.Information("> {Command}", CommandLogFormatter.Format(fileName, arguments));
 
         using var process = CreateProcess(workingDirectory, fileName, arguments);
         process.StartInfo.RedirectStandardOutput = true;
@@ -371,7 +372,7 @@ class Build : NukeBuild
 
         if (process.ExitCode != 0)
             throw new InvalidOperationException(
-                $"Command failed with exit code {process.ExitCode}: {FormatCommand(fileName, arguments)}{Environment.NewLine}{stderr}{stdout}");
+                $"Command failed with exit code {process.ExitCode}: {CommandLogFormatter.Format(fileName, arguments)}{Environment.NewLine}{stderr}{stdout}");
 
         if (!string.IsNullOrWhiteSpace(stderr))
             Log.Debug("{ErrorOutput}", stderr.Trim());
@@ -497,16 +498,6 @@ class Build : NukeBuild
     {
         DeleteDirectoryIfExists(path);
         Directory.CreateDirectory(path);
-    }
-
-    static string FormatCommand(string fileName, IReadOnlyCollection<string> arguments)
-    {
-        return string.Join(" ", new[] { fileName }.Concat(arguments.Select(QuoteArgument)));
-    }
-
-    static string QuoteArgument(string argument)
-    {
-        return argument.Any(char.IsWhiteSpace) ? $"\"{argument}\"" : argument;
     }
 
     static void DeleteDirectoryIfExists(string path)

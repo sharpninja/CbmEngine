@@ -301,6 +301,14 @@ Given identical inputs, when BootRunner.Run is invoked three times, then all thr
 
 
 
+## TEST-CBM-DEPS
+
+### TEST-CBM-DEPS-001
+
+After each slice and at completion, dotnet test (Unit + Integration) passes 0 failed / 0 skipped, on xUnit v3, with zero Moq references.
+
+
+
 ## TEST-CBM-HOST
 
 ### TEST-CBM-HOST-001
@@ -410,6 +418,19 @@ BenchmarkDotNet MemoryDiagnoser - Gen0/Gen1/Gen2 == 0 after warm-up.
 
 After 1s emulated playback, RecordingAudioBackend.Samples.Count(s => Math.Abs(s) > 0.001) >= 1000.
 
+
+
+## TEST-CBM-PUBLISH
+
+### TEST-CBM-PUBLISH-001
+
+Automated tests cover API key masking for supported command forms, Nuke parameter secrecy, non-secret argument preservation, and repository gates.
+
+**Acceptance Criteria:**
+- [x] A unit test proves a separate --api-key value is absent from formatted output and replaced by the redaction token. (evidence: CommandLogFormatterTests.Format_RedactsSeparateApiKeyValue passed.)
+- [x] A unit test proves an inline --api-key=value secret is absent from formatted output. (evidence: CommandLogFormatterTests.Format_RedactsInlineApiKeyValue passed.)
+- [x] A source contract test proves NuGetApiKey remains annotated with Secret. (evidence: CommandLogFormatterTests.BuildNuGetApiKeyParameter_RemainsSecret passed.)
+- [x] The build project compiles and all executed Unit and Integration tests pass with zero failed and zero skipped. (evidence: _build and solution Release builds succeeded with 0 warnings/errors; Unit 201/201 and Integration 81/81 passed, zero failed/skipped.)
 
 
 ## TEST-CBM-SAMPLE

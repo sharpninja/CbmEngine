@@ -45,6 +45,21 @@ Scope: layer-1+
 - [ ] CbmFont8x8.GetGlyph covers A-Z, 0-9, space; returns 8 bytes; missing glyph all-zero.
 - [ ] Drawing more than 3 non-background colors in one 4x8 cell still encodes without throwing.
 
+## FR-CBM-DEPS-001 NuGet dependencies current at highest compatible stable
+
+CbmEngine NuGet dependencies sit at their highest mutually compatible stable versions on net10.0, with the Unit and Integration suites green.
+Scope: layer-1+
+
+## FR-CBM-DEPS-002 Test mocking uses NSubstitute; Moq removed
+
+All test mocking uses NSubstitute; the Moq package and all Moq usages are removed from the solution.
+Scope: layer-1+
+
+## FR-CBM-DEPS-003 Tests run on xUnit v3
+
+Test projects run on xUnit v3 (xunit.v3), mirroring the aiUnit v3 conventions (OutputType Exe, global using Xunit, xunit.runner.json).
+Scope: layer-1+
+
 ## FR-CBM-ENCODE-001 Raw-span multicolor encode overload (CBMFR-001 follow-up)
 
 Add Encode(ReadOnlySpan<Rgba32> pixels,int width,int height,byte? forceBackgroundColor) so callers encode frames without an ImageSharp Image.
@@ -154,6 +169,14 @@ Scope: layer-1+
 
 dotnet run --project src/CbmEngine.Game.Sample -- --midi=fixtures/midi/test.mid loads and plays MIDI through the C64 emulator; RecordingAudioBackend captures >=1000 samples with abs>0.001 in the first second.
 Scope: layer-1+
+
+## FR-CBM-PUBLISH-001 NuGet publishing protects API credentials
+
+CbmEngine package publishing must authenticate successfully without writing NuGet API key values to console logs, build transcripts, or command-failure messages.
+Scope: layer-1+
+**Acceptance Criteria:**
+- [x] Publishing logs and process-failure messages never contain the NuGet API key value. (evidence: _build/CommandLogFormatter.cs and _build/Build.cs redact --api-key values in informational and failure command rendering; targeted tests 5/5 passed.)
+- [x] The original unredacted API key argument is still passed to dotnet nuget push. (evidence: RunProcessIn and CaptureProcessIn pass the original arguments collection to CreateProcess; CommandLogFormatter only formats log/error text. Input non-mutation test passed.)
 
 ## FR-CBM-PUMP-001 General per-frame bitmap pump (CBMFR-003)
 
