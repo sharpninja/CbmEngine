@@ -46,3 +46,6 @@ todo-bootstrap.marker
 # NuGet package output
 *.nupkg
 **/nupkg/
+
+cache/
+AGENTS-README-FIRST.yaml.deleted-*
